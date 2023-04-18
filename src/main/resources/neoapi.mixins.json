@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "me.neovitalism.neoapi.mixins",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "EntityDataSaverMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "neoapi",
+  "version": "${version}",
+
+  "name": "NeoAPI",
+  "description": "Neovitalism's API",
+  "authors": [
+    "Neovitalism"
+  ],
+  "contact": {
+    "homepage": "https://discord.gg/fQXCccxMrD"
+  },
+
+  "license": "MIT",
+  "icon": "assets/neoapi/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "me.neovitalism.neoapi.NeoAPI"
+    ]
+  },
+
+  "depends": {
+    "fabricloader": ">=0.14.10",
+    "fabric-api": "*",
+    "minecraft": "~1.19",
+    "java": ">=17"
+  },
+
+  "mixins": [
+    "neoapi.mixins.json"
+  ],
+
+  "suggests": {
+    "luckperms": ">=5.4.67"
+  }
+}
