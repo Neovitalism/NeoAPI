@@ -25,11 +25,18 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 public abstract class NeoMod implements ModInitializer {
     public abstract String getModID();
     public abstract String getModPrefix();
     public abstract LangManager getLangManager();
+
+    private static List<NeoMod> loadedMods = new ArrayList<>();
 
     public NeoMod() {
         if(!registered) {
@@ -106,7 +113,8 @@ public abstract class NeoMod implements ModInitializer {
         File configFile = new File(configFolder, fileName);
         if (!configFile.exists()) {
             FileOutputStream outputStream = new FileOutputStream(configFile);
-            InputStream in = getClass().getClassLoader().getResourceAsStream(fileName);
+            Path path = Paths.get(getModID().toLowerCase(Locale.ENGLISH), fileName);
+            InputStream in = getClass().getClassLoader().getResourceAsStream(path.toString().replace("\\", "/"));
             in.transferTo(outputStream);
         }
         return configFile;
