@@ -14,7 +14,7 @@ import static net.minecraft.server.command.CommandManager.literal;
 public abstract class ReloadCommandBase implements CommandBase {
     public ReloadCommandBase(NeoMod instance, CommandDispatcher<ServerCommandSource> dispatcher) {
         LiteralCommandNode<ServerCommandSource> reloadCommand = register(instance, dispatcher);
-        registerAliases(dispatcher, reloadCommand,instance.getModID().toLowerCase(Locale.ENGLISH)+".reload", 4);
+        registerAliases(dispatcher, reloadCommand);
     }
 
     public LiteralCommandNode<ServerCommandSource> register(NeoMod instance, CommandDispatcher<ServerCommandSource> dispatcher) {

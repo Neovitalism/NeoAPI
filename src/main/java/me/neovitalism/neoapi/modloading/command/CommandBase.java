@@ -1,6 +1,8 @@
 package me.neovitalism.neoapi.modloading.command;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import me.neovitalism.neoapi.modloading.NeoMod;
 import net.minecraft.server.command.ServerCommandSource;
@@ -12,10 +14,15 @@ public interface CommandBase {
 
     LiteralCommandNode<ServerCommandSource> register(NeoMod instance, CommandDispatcher<ServerCommandSource> dispatcher);
 
-    default void registerAliases(CommandDispatcher<ServerCommandSource> dispatcher, LiteralCommandNode<ServerCommandSource> command, String permission, int level) {
+    default void registerAliases(CommandDispatcher<ServerCommandSource> dispatcher, LiteralCommandNode<ServerCommandSource> command) {
         for(String alias : getCommandAliases()) {
-            dispatcher.register(literal(alias).requires(serverCommandSource ->
-                    NeoMod.checkForPermission(serverCommandSource, permission, level)).redirect(command));
+            LiteralArgumentBuilder<ServerCommandSource> builder = literal(alias)
+                    .requires(command.getRequirement())
+                    .executes(command.getCommand());
+            for(CommandNode<ServerCommandSource> child : command.getChildren()) {
+                builder.then(child);
+            }
+            dispatcher.register(builder);
         }
     }
 }
