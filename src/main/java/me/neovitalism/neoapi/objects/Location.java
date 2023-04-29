@@ -5,6 +5,8 @@ import me.neovitalism.neoapi.world.WorldManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 
+import java.util.Map;
+
 public class Location {
     private final ServerWorld world;
     private final double x;
@@ -68,5 +70,14 @@ public class Location {
         locationConfig.set("pitch", pitch);
         locationConfig.set("yaw", yaw);
         return locationConfig;
+    }
+
+    public void addReplacements(Map<String, String> replacements) {
+        replacements.put("{x}", String.valueOf(x));
+        replacements.put("{y}", String.valueOf(y));
+        replacements.put("{z}", String.valueOf(z));
+        replacements.put("{pitch}", String.valueOf(pitch));
+        replacements.put("{yaw}", String.valueOf(yaw));
+        replacements.put("{world}", WorldManager.getWorldName(world));
     }
 }

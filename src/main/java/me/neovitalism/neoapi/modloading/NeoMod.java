@@ -51,12 +51,8 @@ public abstract class NeoMod implements ModInitializer {
                 permissionProvider = null;
             });
             ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-                NbtCompound persistentData = PlayerManager.getPersistentData(handler.getPlayer());
-                boolean joinedBefore = (persistentData.contains("joinedBefore") && persistentData.getBoolean("joinedBefore"));
+                boolean joinedBefore = PlayerManager.getFirstJoinTag(handler.getPlayer());
                 JoinEvent.EVENT.invoker().interact(handler.getPlayer(), joinedBefore);
-                if(!joinedBefore) {
-                    PlayerManager.getPersistentData(handler.getPlayer()).putBoolean("joinedBefore", true);
-                }
             });
             ServerLifecycleEvents.SERVER_STARTED.register(server -> {
                 WorldManager.mapWorlds(server);
