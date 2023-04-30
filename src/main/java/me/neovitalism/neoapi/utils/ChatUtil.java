@@ -2,9 +2,17 @@ package me.neovitalism.neoapi.utils;
 
 import me.neovitalism.neoapi.lang.LangManager;
 import me.neovitalism.neoapi.modloading.NeoMod;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.TranslatableComponent;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public final class ChatUtil {
@@ -145,5 +153,25 @@ public final class ChatUtil {
             input = input.replace(key, replacements.get(key));
         }
         return input;
+    }
+
+    public static String componentToString(ComponentLike component) {
+        Component styledComponent = component.asComponent();
+        StringBuilder sb = new StringBuilder();
+        for(Map.Entry<TextDecoration, TextDecoration.State> entry : styledComponent.decorations().entrySet()) {
+            if(entry.getValue().equals(TextDecoration.State.TRUE)) {
+                sb.append("<").append(entry.getKey().toString()).append(">");
+            }
+        }
+        TextColor color = styledComponent.color();
+        if(color != null) sb.append("<c:").append(color.asHexString()).append(">");
+        if(component instanceof TextComponent) {
+            sb.append(((TextComponent)component).content());
+        }
+        if(component instanceof TranslatableComponent) {
+            sb.append("<lang:").append(((TranslatableComponent) component).key()).append(">");
+        }
+        sb.append("<reset>");
+        return sb.toString();
     }
 }
