@@ -16,7 +16,6 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.kyori.adventure.platform.fabric.FabricServerAudiences;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -28,16 +27,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 public abstract class NeoMod implements ModInitializer {
     public abstract String getModID();
     public abstract String getModPrefix();
     public abstract LangManager getLangManager();
-
-    private static List<NeoMod> loadedMods = new ArrayList<>();
 
     public NeoMod() {
         if(!registered) {
@@ -55,6 +50,9 @@ public abstract class NeoMod implements ModInitializer {
             ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
                 boolean joinedBefore = PlayerManager.getFirstJoinTag(handler.getPlayer());
                 JoinEvent.EVENT.invoker().interact(handler.getPlayer(), joinedBefore);
+                if(!joinedBefore) {
+                    PlayerManager.addTag(handler.getPlayer(), "neoapi.joinedBefore");
+                }
             });
             ServerLifecycleEvents.SERVER_STARTED.register(server -> {
                 WorldManager.mapWorlds(server);
