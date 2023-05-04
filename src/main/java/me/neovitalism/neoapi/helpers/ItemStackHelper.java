@@ -24,8 +24,8 @@ public class ItemStackHelper {
                     + item.getItem().getName().getString()
                     .toLowerCase(Locale.ENGLISH)
                     .replace(" ", "_") +
-                    ":" + item.getCount() + ":\"" +
-                    itemNBT + "\">";
+                    ":" + item.getCount() + ":'" +
+                    itemNBT + "'>";
         } else {
             return "<hover:show_item:"
                     + item.getItem().getName().getString()
