@@ -1,7 +1,7 @@
 package me.neovitalism.neoapi.modloading;
 
 import me.neovitalism.neoapi.NeoAPI;
-import me.neovitalism.neoapi.events.JoinEvent;
+import me.neovitalism.neoapi.events.player.PlayerJoinEvent;
 import me.neovitalism.neoapi.helpers.AsynchronousHelper;
 import me.neovitalism.neoapi.lang.LangManager;
 import me.neovitalism.neoapi.modloading.config.Configuration;
@@ -49,7 +49,7 @@ public abstract class NeoMod implements ModInitializer {
             });
             ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
                 boolean joinedBefore = PlayerManager.getFirstJoinTag(handler.getPlayer());
-                JoinEvent.EVENT.invoker().interact(handler.getPlayer(), joinedBefore);
+                PlayerJoinEvent.EVENT.invoker().interact(handler.getPlayer(), joinedBefore);
                 if(!joinedBefore) PlayerManager.addTag(handler.getPlayer(), "neoapi.joinedBefore");
             });
             ServerLifecycleEvents.SERVER_STARTED.register(server -> {

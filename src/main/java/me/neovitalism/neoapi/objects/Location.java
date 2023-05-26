@@ -80,4 +80,20 @@ public class Location {
         replacements.put("{yaw}", String.valueOf(yaw));
         replacements.put("{world}", WorldManager.getWorldName(world));
     }
+
+    public boolean isEqualTo(Location location) {
+        return (world.equals(location.getWorld()))
+                && (x == location.getX())
+                && (y == location.getY())
+                && (z == location.getZ())
+                && (yaw == location.getYaw())
+                && (pitch == location.getPitch());
+    }
+
+    public boolean isEqualToCoordinatesOf(Location location) {
+        return (world.equals(location.getWorld()))
+                && (x == location.getX())
+                && (y == location.getY())
+                && (z == location.getZ());
+    }
 }

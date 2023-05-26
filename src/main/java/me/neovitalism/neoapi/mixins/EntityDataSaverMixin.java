@@ -20,12 +20,12 @@ public abstract class EntityDataSaverMixin implements EntityDataStorage {
     }
 
     @Inject(method = "writeNbt", at = @At("HEAD"))
-    protected void addDataToNBT(NbtCompound nbt, CallbackInfoReturnable<NbtCompound> cir) {
+    protected void neoAPI$addDataToNBT(NbtCompound nbt, CallbackInfoReturnable<NbtCompound> cir) {
         if(persistentData != null) nbt.put("neoapi.persistent_data", persistentData);
     }
 
     @Inject(method = "readNbt", at = @At("HEAD"))
-    protected void readDataFromNBT(NbtCompound nbt, CallbackInfo ci) {
+    protected void neoAPI$readDataFromNBT(NbtCompound nbt, CallbackInfo ci) {
         if(nbt.contains("neoapi.persistent_data", 10)) persistentData = nbt.getCompound("neoapi.persistent_data");
     }
 }

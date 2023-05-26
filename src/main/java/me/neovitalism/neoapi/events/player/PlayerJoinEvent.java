@@ -1,12 +1,12 @@
-package me.neovitalism.neoapi.events;
+package me.neovitalism.neoapi.events.player;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-public interface JoinEvent {
-    Event<JoinEvent> EVENT = EventFactory.createArrayBacked(JoinEvent.class, (listeners) -> (player, firstJoin) -> {
-        for (JoinEvent listener : listeners) {
+public interface PlayerJoinEvent {
+    Event<PlayerJoinEvent> EVENT = EventFactory.createArrayBacked(PlayerJoinEvent.class, (listeners) -> (player, firstJoin) -> {
+        for (PlayerJoinEvent listener : listeners) {
             listener.interact(player, firstJoin);
         }
     });
