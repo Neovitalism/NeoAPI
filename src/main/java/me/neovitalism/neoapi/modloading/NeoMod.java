@@ -147,6 +147,10 @@ public abstract class NeoMod implements ModInitializer {
         return permissionProvider.checkForPermission(player, permission, level);
     }
 
+    public static boolean checkForPermission(@NotNull ServerPlayerEntity player, String permission) {
+        return permissionProvider.checkForPermission(player, permission);
+    }
+
     public static String checkMetaPermission(@NotNull ServerPlayerEntity player, String metaKey) {
         return permissionProvider.getMetaPermission(player, metaKey);
     }

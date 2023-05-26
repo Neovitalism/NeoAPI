@@ -15,6 +15,7 @@ import java.util.concurrent.CompletableFuture;
 public final class PlayerSuggestionProvider implements SuggestionProvider<ServerCommandSource> {
     private final NeoMod instance;
     private boolean permissionToInclude = false;
+    private String exemptPermission = "";
 
     public PlayerSuggestionProvider(NeoMod instance) {
         this.instance = instance;
@@ -28,7 +29,11 @@ public final class PlayerSuggestionProvider implements SuggestionProvider<Server
     @Override
     public CompletableFuture<Suggestions> getSuggestions(CommandContext<ServerCommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
         List<String> completions = new ArrayList<>();
-        instance.getServer().getPlayerManager().getPlayerList().forEach(player -> completions.add(player.getName().getString()));
+        instance.getServer().getPlayerManager().getPlayerList().forEach(player -> {
+            if(exemptPermission == null || !NeoMod.checkForPermission(player, exemptPermission)) {
+                completions.add(player.getName().getString());
+            }
+        });
         if(permissionToInclude) completions.add("all");
         try {
             String arg = context.getArgument("player", String.class);
@@ -49,5 +54,10 @@ public final class PlayerSuggestionProvider implements SuggestionProvider<Server
         if(arg.length() > completion.length()) return false;
         String argEquiv = completion.substring(0, arg.length());
         return arg.equalsIgnoreCase(argEquiv);
+    }
+
+    public PlayerSuggestionProvider setExemptPermission(String exemptPermission) {
+        this.exemptPermission = exemptPermission;
+        return this;
     }
 }

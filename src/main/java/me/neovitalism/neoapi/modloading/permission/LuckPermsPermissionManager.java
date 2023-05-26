@@ -20,6 +20,11 @@ public final class LuckPermsPermissionManager implements PermissionManager {
     }
 
     @Override
+    public boolean checkForPermission(ServerPlayerEntity serverPlayerEntity, String permission) {
+        return getPlayerAdapter().getPermissionData(serverPlayerEntity).checkPermission(permission).asBoolean();
+    }
+
+    @Override
     public @Nullable String getMetaPermission(ServerPlayerEntity serverPlayerEntity, String metaKey) {
         return getPlayerAdapter().getMetaData(serverPlayerEntity).getMetaValue(metaKey);
     }

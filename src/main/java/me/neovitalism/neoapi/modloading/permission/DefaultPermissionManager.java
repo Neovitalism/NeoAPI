@@ -14,6 +14,11 @@ public final class DefaultPermissionManager implements PermissionManager {
     }
 
     @Override
+    public boolean checkForPermission(ServerPlayerEntity serverPlayerEntity, String permission) {
+        return serverPlayerEntity.hasPermissionLevel(4);
+    }
+
+    @Override
     public @Nullable String getMetaPermission(ServerPlayerEntity serverPlayerEntity, String permission) {
         return null;
     }
