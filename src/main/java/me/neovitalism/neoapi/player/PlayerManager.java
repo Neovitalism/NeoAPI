@@ -17,6 +17,16 @@ public final class PlayerManager {
         player.getScoreboardTags().add(tag);
     }
 
+    public static void removeTag(ServerPlayerEntity player, String tag) {
+        player.getScoreboardTags().remove(tag);
+    }
+
+    public static void toggleTag(ServerPlayerEntity player, String tag) {
+        if(containsTag(player, tag)) {
+            removeTag(player, tag);
+        } else addTag(player, tag);
+    }
+
     /**
      * This is not a method to be used, only used to support previously existing tags. This will be removed in a later version.
      **/
