@@ -8,6 +8,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtString;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -51,14 +53,7 @@ public class ItemStackHelper {
             String name = itemConfig.getString("Name");
             if(name != null) itemStack.setCustomName(ColorUtil.parseColourToText(name));
             List<String> lore = itemConfig.getStringList("Lore");
-            StringBuilder loreBuilder = new StringBuilder();
-            int i = 0;
-            for(String line : lore) {
-                if(i != 0) loreBuilder.append("\n");
-                loreBuilder.append(line);
-                i++;
-            }
-            if(!loreBuilder.isEmpty()) setLore(itemStack, ColorUtil.parseColourToText(loreBuilder.toString()));
+            setLore(itemStack, lore);
             itemStack.setCount((amount == -1) ? itemConfig.getInt("Amount", 1) : amount);
             List<String> enchants = itemConfig.getStringList("Enchants");
             for(String enchant : enchants) {
@@ -102,13 +97,19 @@ public class ItemStackHelper {
         } else return null;
     }
 
-    public static ItemStack setLore(ItemStack item, Text lore) {
-        NbtCompound nbtCompound = item.getOrCreateSubNbt("display");
-        if (lore != null) {
-            nbtCompound.putString("Lore", Text.Serializer.toJson(lore));
+    public static void setLore(ItemStack item, List<String> lore) {
+        NbtCompound displayNBT = item.getOrCreateSubNbt("display");
+        if (lore != null && !lore.isEmpty()) {
+            NbtList loreList = new NbtList();
+            for(String line : lore) {
+                loreList.add(NbtString.of(Text.Serializer.toJson(ColorUtil.parseColourToText(line))));
+            }
+            displayNBT.put("Lore", loreList);
         } else {
-            nbtCompound.remove("Lore");
+            displayNBT.remove("Lore");
+            if(displayNBT.isEmpty()) {
+                item.removeSubNbt("display");
+            }
         }
-        return item;
     }
 }
