@@ -11,8 +11,10 @@ public final class LangManager {
     private final Map<String, String> lang = new HashMap<>();
 
     public LangManager(Configuration langConfig) {
-        for(String key : langConfig.getKeys()) {
-            lang.put(key, langConfig.getString(key));
+        if(langConfig != null) {
+            for (String key : langConfig.getKeys()) {
+                lang.put(key, langConfig.getString(key));
+            }
         }
     }
 
