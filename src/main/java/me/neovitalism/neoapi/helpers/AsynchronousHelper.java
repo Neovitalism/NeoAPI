@@ -23,6 +23,6 @@ public class AsynchronousHelper {
     }
 
     public static void shutdown() {
-        ASYNC_EXEC.shutdown();
+        ASYNC_EXEC.shutdownNow();
     }
 }

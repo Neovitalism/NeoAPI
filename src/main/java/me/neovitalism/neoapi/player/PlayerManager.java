@@ -1,8 +1,13 @@
 package me.neovitalism.neoapi.player;
 
 import me.neovitalism.neoapi.entity.EntityDataStorage;
+import me.neovitalism.neoapi.modloading.NeoMod;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public final class PlayerManager {
     public static NbtCompound getPersistentData(ServerPlayerEntity player) {
@@ -39,5 +44,42 @@ public final class PlayerManager {
             PlayerManager.addTag(player, "neoapi.joinedBefore");
         }
         return PlayerManager.containsTag(player,"neoapi.joinedBefore");
+    }
+
+    public static ServerPlayerEntity getPlayer(NeoMod instance, String name) {
+        return getPlayerManager(instance).getPlayer(name);
+    }
+
+    public static ServerPlayerEntity getPlayer(NeoMod instance, UUID uuid) {
+        return getPlayerManager(instance).getPlayer(uuid);
+    }
+
+    public static List<ServerPlayerEntity> getAllPlayers(NeoMod instance) {
+        return getPlayerManager(instance).getPlayerList();
+    }
+
+    public static List<ServerPlayerEntity> getAllPlayersExcept(NeoMod instance, String exemptPermission) {
+        if(exemptPermission == null) return getAllPlayers(instance);
+        List<ServerPlayerEntity> players = new ArrayList<>();
+        getAllPlayers(instance).forEach(player -> {
+            if(!NeoMod.checkForPermission(player, exemptPermission)) {
+                players.add(player);
+            }
+        });
+        return players;
+    }
+
+    public static List<ServerPlayerEntity> getAllPlayersExcept(NeoMod instance, String exemptPermission, List<UUID> exemptPlayerUUIDs) {
+        List<ServerPlayerEntity> players = new ArrayList<>();
+        getAllPlayers(instance).forEach(player -> {
+            if(!exemptPlayerUUIDs.contains(player.getUuid()) && !NeoMod.checkForPermission(player, exemptPermission)) {
+                players.add(player);
+            }
+        });
+        return players;
+    }
+
+    private static net.minecraft.server.PlayerManager getPlayerManager(NeoMod instance) {
+        return instance.getServer().getPlayerManager();
     }
 }

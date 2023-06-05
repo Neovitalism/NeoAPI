@@ -2,6 +2,8 @@ package me.neovitalism.neoapi.utils;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.minecraft.text.Text;
 
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -60,5 +62,13 @@ public final class ColorUtil {
             case "R" -> "<reset>";
             default -> input;
         };
+    }
+    
+    public static Text toText(Component component) {
+        return Text.Serializer.fromJson(GsonComponentSerializer.gson().serialize(component));
+    }
+
+    public static Text parseColourToText(String input) {
+        return toText(parseColour(input));
     }
 }

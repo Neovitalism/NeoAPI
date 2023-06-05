@@ -6,6 +6,7 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import me.neovitalism.neoapi.modloading.NeoMod;
+import me.neovitalism.neoapi.player.PlayerManager;
 import net.minecraft.server.command.ServerCommandSource;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
 public final class PlayerSuggestionProvider implements SuggestionProvider<ServerCommandSource> {
     private final NeoMod instance;
     private boolean permissionToInclude = false;
-    private String exemptPermission = "";
+    private String exemptPermission = null;
 
     public PlayerSuggestionProvider(NeoMod instance) {
         this.instance = instance;
@@ -26,14 +27,21 @@ public final class PlayerSuggestionProvider implements SuggestionProvider<Server
         this.permissionToInclude = permissionToInclude;
     }
 
+    public PlayerSuggestionProvider(NeoMod instance, String exemptPermission) {
+        this.instance = instance;
+        this.exemptPermission = exemptPermission;
+    }
+
+    public PlayerSuggestionProvider(NeoMod instance, boolean permissionToInclude, String exemptPermission) {
+        this.instance = instance;
+        this.permissionToInclude = permissionToInclude;
+        this.exemptPermission = exemptPermission;
+    }
+
     @Override
     public CompletableFuture<Suggestions> getSuggestions(CommandContext<ServerCommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
         List<String> completions = new ArrayList<>();
-        instance.getServer().getPlayerManager().getPlayerList().forEach(player -> {
-            if(exemptPermission == null || !NeoMod.checkForPermission(player, exemptPermission)) {
-                completions.add(player.getName().getString());
-            }
-        });
+        PlayerManager.getAllPlayersExcept(instance, exemptPermission).forEach(player -> completions.add(player.getName().getString()));
         if(permissionToInclude) completions.add("all");
         try {
             String arg = context.getArgument("player", String.class);
@@ -54,10 +62,5 @@ public final class PlayerSuggestionProvider implements SuggestionProvider<Server
         if(arg.length() > completion.length()) return false;
         String argEquiv = completion.substring(0, arg.length());
         return arg.equalsIgnoreCase(argEquiv);
-    }
-
-    public PlayerSuggestionProvider setExemptPermission(String exemptPermission) {
-        this.exemptPermission = exemptPermission;
-        return this;
     }
 }

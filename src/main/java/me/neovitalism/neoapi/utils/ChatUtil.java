@@ -2,6 +2,7 @@ package me.neovitalism.neoapi.utils;
 
 import me.neovitalism.neoapi.lang.LangManager;
 import me.neovitalism.neoapi.modloading.NeoMod;
+import me.neovitalism.neoapi.player.PlayerManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.TextComponent;
@@ -11,9 +12,9 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public final class ChatUtil {
     public static void sendPrettyMessage(ServerCommandSource source, String message) {
@@ -173,5 +174,105 @@ public final class ChatUtil {
         }
         sb.append("<reset>");
         return sb.toString();
+    }
+
+    public static void broadcastToAll(NeoMod instance, String langKey) {
+        LangManager langManager = instance.getLangManager();
+        if(langManager == null) return;
+        String prefix = langManager.getLangSafely("Prefix");
+        String message = langManager.getLangSafely(langKey);
+        if(!message.isBlank() && !message.isEmpty()) {
+            for(ServerPlayerEntity player : PlayerManager.getAllPlayers(instance)) {
+                player.sendMessage(ColorUtil.parseColour(prefix + message));
+            }
+        }
+    }
+
+    public static void broadcastToAll(NeoMod instance, String langKey, Map<String, String> replacements) {
+        LangManager langManager = instance.getLangManager();
+        if(langManager == null) return;
+        String prefix = langManager.getLangSafely("Prefix");
+        String message = langManager.getLangSafely(langKey);
+        if(!message.isBlank() && !message.isEmpty()) {
+            message = replaceReplacements(message, replacements);
+            for(ServerPlayerEntity player : PlayerManager.getAllPlayers(instance)) {
+                player.sendMessage(ColorUtil.parseColour(prefix + message));
+            }
+        }
+    }
+
+    public static void broadcastToAllExcept(NeoMod instance, String langKey, String ignorePermission) {
+        LangManager langManager = instance.getLangManager();
+        if(langManager == null) return;
+        String prefix = langManager.getLangSafely("Prefix");
+        String message = langManager.getLangSafely(langKey);
+        if(!message.isBlank() && !message.isEmpty()) {
+            for(ServerPlayerEntity player : PlayerManager.getAllPlayersExcept(instance, ignorePermission)) {
+                player.sendMessage(ColorUtil.parseColour(prefix + message));
+            }
+        }
+    }
+
+    public static void broadcastToAllExcept(NeoMod instance, String langKey, Map<String, String> replacements, String ignorePermission) {
+        LangManager langManager = instance.getLangManager();
+        if(langManager == null) return;
+        String prefix = langManager.getLangSafely("Prefix");
+        String message = langManager.getLangSafely(langKey);
+        if(!message.isBlank() && !message.isEmpty()) {
+            message = replaceReplacements(message, replacements);
+            for(ServerPlayerEntity player : PlayerManager.getAllPlayersExcept(instance, ignorePermission)) {
+                player.sendMessage(ColorUtil.parseColour(prefix + message));
+            }
+        }
+    }
+
+    public static void broadcastToAllExcept(NeoMod instance, String langKey, List<UUID> ignoredUUIDs) {
+        LangManager langManager = instance.getLangManager();
+        if(langManager == null) return;
+        String prefix = langManager.getLangSafely("Prefix");
+        String message = langManager.getLangSafely(langKey);
+        if(!message.isBlank() && !message.isEmpty()) {
+            for(ServerPlayerEntity player : PlayerManager.getAllPlayersExcept(instance, null, ignoredUUIDs)) {
+                player.sendMessage(ColorUtil.parseColour(prefix + message));
+            }
+        }
+    }
+
+    public static void broadcastToAllExcept(NeoMod instance, String langKey, Map<String, String> replacements, List<UUID> ignoredUUIDs) {
+        LangManager langManager = instance.getLangManager();
+        if(langManager == null) return;
+        String prefix = langManager.getLangSafely("Prefix");
+        String message = langManager.getLangSafely(langKey);
+        if(!message.isBlank() && !message.isEmpty()) {
+            message = replaceReplacements(message, replacements);
+            for(ServerPlayerEntity player : PlayerManager.getAllPlayersExcept(instance, null, ignoredUUIDs)) {
+                player.sendMessage(ColorUtil.parseColour(prefix + message));
+            }
+        }
+    }
+
+    public static void broadcastToAllExcept(NeoMod instance, String langKey, String ignorePermission, List<UUID> ignoredUUIDs) {
+        LangManager langManager = instance.getLangManager();
+        if(langManager == null) return;
+        String prefix = langManager.getLangSafely("Prefix");
+        String message = langManager.getLangSafely(langKey);
+        if(!message.isBlank() && !message.isEmpty()) {
+            for(ServerPlayerEntity player : PlayerManager.getAllPlayersExcept(instance, ignorePermission, ignoredUUIDs)) {
+                player.sendMessage(ColorUtil.parseColour(prefix + message));
+            }
+        }
+    }
+
+    public static void broadcastToAllExcept(NeoMod instance, String langKey, Map<String, String> replacements, String ignorePermission, List<UUID> ignoredUUIDs) {
+        LangManager langManager = instance.getLangManager();
+        if(langManager == null) return;
+        String prefix = langManager.getLangSafely("Prefix");
+        String message = langManager.getLangSafely(langKey);
+        if(!message.isBlank() && !message.isEmpty()) {
+            message = replaceReplacements(message, replacements);
+            for(ServerPlayerEntity player : PlayerManager.getAllPlayersExcept(instance, ignorePermission, ignoredUUIDs)) {
+                player.sendMessage(ColorUtil.parseColour(prefix + message));
+            }
+        }
     }
 }
