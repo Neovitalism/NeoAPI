@@ -1,8 +1,10 @@
 package me.neovitalism.neoapi.utils;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 
 import java.util.Locale;
@@ -70,5 +72,17 @@ public final class ColorUtil {
 
     public static Text parseColourToText(String input) {
         return toText(parseColour(input));
+    }
+
+    public static Text parseItemName(String name) {
+        Text text = parseColourToText(name);
+        Component fullComponent = Component.empty();
+        for(Text loopText : text.getWithStyle(Style.EMPTY)) {
+            Style style = loopText.getStyle();
+            Component component = loopText.asComponent();
+            if(!style.isItalic()) component = component.decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE);
+            fullComponent = fullComponent.append(component);
+        }
+        return toText(fullComponent);
     }
 }
