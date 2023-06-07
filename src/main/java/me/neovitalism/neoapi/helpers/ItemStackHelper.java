@@ -99,6 +99,12 @@ public class ItemStackHelper {
         }
     }
 
+    public static boolean hasNBTKey(ItemStack itemStack, String nbtKey) {
+        NbtCompound itemNBT = itemStack.getNbt();
+        if(itemNBT == null || itemStack.isEmpty()) return false;
+        return itemNBT.get(nbtKey) != null;
+    }
+
     public static NbtElement getNBTElement(Object input) {
         if(input instanceof NbtCompound) return (NbtCompound) input;
         if(input instanceof Byte) return NbtByte.of((Byte) input);
