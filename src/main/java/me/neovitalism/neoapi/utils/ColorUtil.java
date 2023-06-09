@@ -85,4 +85,22 @@ public final class ColorUtil {
         }
         return toText(fullComponent);
     }
+
+    public static String serialize(Component component) {
+        return MiniMessage.miniMessage().serialize(component);
+    }
+
+    public static String serializeWithoutLeadingSpaces(Text text) {
+        boolean passedFirst = false;
+        Component returnComponent = Component.empty();
+        for(Text loopText : text.getWithStyle(Style.EMPTY)) {
+            if(!passedFirst) {
+                String firstText = loopText.getString();
+                if(firstText.isEmpty() || firstText.isBlank()) continue;
+            }
+            passedFirst = true;
+            returnComponent = returnComponent.append(loopText.asComponent());
+        }
+        return serialize(returnComponent);
+    }
 }
