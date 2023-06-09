@@ -4,6 +4,7 @@ import me.neovitalism.neoapi.events.EventInterfaces;
 import me.neovitalism.neoapi.events.PlayerEvents;
 import me.neovitalism.neoapi.objects.Location;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.*;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
@@ -19,7 +20,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
@@ -27,7 +27,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 public abstract class ServerPlayNetworkHandlerMixin {
     @Shadow public ServerPlayerEntity player;
 
-    @Inject(method = "onPlayerMove(Lnet/minecraft/network/packet/c2s/play/PlayerMoveC2SPacket;)V",
+    @Inject(method = "onPlayerMove",
             at = @At(value = "HEAD"), cancellable = true)
     public void neoAPI$onPlayerMove(PlayerMoveC2SPacket packet, CallbackInfo ci) {
         Location oldLocation = new Location(player.getWorld(), player.getX(), player.getY(), player.getZ(), player.getPitch(), player.getYaw());
@@ -44,7 +44,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
         }
     }
 
-    @Inject(method = "onPlayerAction(Lnet/minecraft/network/packet/c2s/play/PlayerActionC2SPacket;)V",
+    @Inject(method = "onPlayerAction",
             at = @At(target = "Lnet/minecraft/network/packet/c2s/play/PlayerActionC2SPacket;getAction()Lnet/minecraft/network/packet/c2s/play/PlayerActionC2SPacket$Action;"
                 , value = "INVOKE"), cancellable = true, locals = LocalCapture.CAPTURE_FAILSOFT)
     public void neoAPI$onPlayerAction(PlayerActionC2SPacket packet, CallbackInfo ci, BlockPos blockPos) {
@@ -65,7 +65,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
         }
     }
 
-    @Inject(method = "onPlayerInteractEntity(Lnet/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket;)V",
+    @Inject(method = "onPlayerInteractEntity",
             at = @At(target = "Lnet/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket;handle(Lnet/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$Handler;)V",
                     value = "INVOKE"), cancellable = true)
     public void neoAPI$onInteractEntity(PlayerInteractEntityC2SPacket packet, CallbackInfo ci) {
@@ -98,7 +98,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
         }
     }
 
-    @Inject(method = "onPlayerInteractBlock(Lnet/minecraft/network/packet/c2s/play/PlayerInteractBlockC2SPacket;)V",
+    @Inject(method = "onPlayerInteractBlock",
             at = @At(target = "Lnet/minecraft/server/network/ServerPlayerInteractionManager;interactBlock(Lnet/minecraft/server/network/ServerPlayerEntity;Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;",
                     value = "INVOKE"), cancellable = true, locals = LocalCapture.CAPTURE_FAILSOFT)
     public void neoAPI$onInteractBlock(PlayerInteractBlockC2SPacket packet, CallbackInfo ci, ServerWorld serverWorld, Hand hand, ItemStack itemStack, BlockHitResult blockHitResult, Vec3d vec3d, BlockPos blockPos, Vec3d vec3d2, Vec3d vec3d3, double d, Direction direction, int i) {
@@ -107,7 +107,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
         }
     }
 
-    @Inject(method = "onPlayerInteractItem(Lnet/minecraft/network/packet/c2s/play/PlayerInteractItemC2SPacket;)V",
+    @Inject(method = "onPlayerInteractItem",
             at = @At(target = "Lnet/minecraft/server/network/ServerPlayerEntity;updateLastActionTime()V",
                     value = "TAIL"), cancellable = true, locals = LocalCapture.CAPTURE_FAILSOFT)
     public void neoAPI$onInteractItem(PlayerInteractItemC2SPacket packet, CallbackInfo ci, ServerWorld serverWorld, Hand hand, ItemStack itemStack) {
@@ -116,7 +116,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
         }
     }
 
-    @Inject(method = "onChatMessage(Lnet/minecraft/network/packet/c2s/play/ChatMessageC2SPacket;)V",
+    @Inject(method = "onChatMessage",
             at = @At(target = "Lnet/minecraft/server/MinecraftServer;submit(Ljava/lang/Runnable;)Ljava/util/concurrent/CompletableFuture;",
                     value = "INVOKE"), cancellable = true)
     public void neoAPI$onChat(ChatMessageC2SPacket packet, CallbackInfo ci) {
@@ -128,11 +128,29 @@ public abstract class ServerPlayNetworkHandlerMixin {
         }
     }
 
-    @Inject(method = "onCommandExecution(Lnet/minecraft/network/packet/c2s/play/CommandExecutionC2SPacket;)V",
+    @Inject(method = "onCommandExecution",
             at = @At(target = "Lnet/minecraft/server/MinecraftServer;submit(Ljava/lang/Runnable;)Ljava/util/concurrent/CompletableFuture;",
                     value = "INVOKE"), cancellable = true)
     public void neoAPI$onCommand(CommandExecutionC2SPacket packet, CallbackInfo ci) {
         if(!PlayerEvents.RUN_COMMAND.invoker().interact(player, packet.command())) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "onHandSwing",
+            at = @At(target = "Lnet/minecraft/server/network/ServerPlayerEntity;swingHand(Lnet/minecraft/util/Hand;)V",
+                    value = "INVOKE"), cancellable = true)
+    public void neoAPI$onHandSwing(HandSwingC2SPacket packet, CallbackInfo ci) {
+        if(!PlayerEvents.SWING_HAND.invoker().interact(player, packet.getHand())) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "onBoatPaddleState",
+            at = @At(target = "Lnet/minecraft/entity/vehicle/BoatEntity;setPaddleMovings(ZZ)V",
+                    value = "INVOKE"), cancellable = true, locals = LocalCapture.CAPTURE_FAILSOFT)
+    public void neoAPI$onBoatPaddle(BoatPaddleStateC2SPacket packet, CallbackInfo ci, Entity entity) {
+        if(!PlayerEvents.PADDLE_BOAT.invoker().interact(player, (BoatEntity) entity)) {
             ci.cancel();
         }
     }

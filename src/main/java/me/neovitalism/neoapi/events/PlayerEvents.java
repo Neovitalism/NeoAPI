@@ -82,4 +82,20 @@ public class PlayerEvents {
                 }
                 return true;
             });
+
+    public static final Event<EventInterfaces.PlayerSwingHandEvent> SWING_HAND = EventFactory.createArrayBacked(
+            EventInterfaces.PlayerSwingHandEvent.class, (listeners) -> (player, hand) -> {
+                for(EventInterfaces.PlayerSwingHandEvent listener : listeners) {
+                    if(!listener.interact(player, hand)) return false;
+                }
+                return true;
+            });
+
+    public static final Event<EventInterfaces.PlayerPaddleBoatEvent> PADDLE_BOAT = EventFactory.createArrayBacked(
+            EventInterfaces.PlayerPaddleBoatEvent.class, (listeners) -> (player, boatEntity) -> {
+                for(EventInterfaces.PlayerPaddleBoatEvent listener : listeners) {
+                    if(!listener.interact(player, boatEntity)) return false;
+                }
+                return true;
+            });
 }

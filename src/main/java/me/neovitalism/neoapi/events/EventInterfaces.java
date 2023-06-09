@@ -2,6 +2,7 @@ package me.neovitalism.neoapi.events;
 
 import me.neovitalism.neoapi.objects.Location;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -49,5 +50,13 @@ public class EventInterfaces {
 
     public interface PlayerCommandEvent {
         boolean interact(ServerPlayerEntity player, String command);
+    }
+
+    public interface PlayerSwingHandEvent {
+        boolean interact(ServerPlayerEntity player, Hand hand);
+    }
+
+    public interface PlayerPaddleBoatEvent {
+        boolean interact(ServerPlayerEntity player, BoatEntity boatEntity);
     }
 }
