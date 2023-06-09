@@ -26,4 +26,8 @@ public class RandomHelper {
         }
         return null;
     }
+
+    public static boolean getRandomChance(int outOf) {
+        return randomIntBetween(1, outOf) == 1;
+    }
 }
