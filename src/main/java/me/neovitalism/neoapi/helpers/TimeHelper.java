@@ -4,8 +4,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class TimeHelper {
-    public static void addReplacements(Map<String, String> replacements, long milliseconds) {
-        long secondsTotal = TimeUnit.MILLISECONDS.toSeconds(milliseconds);
+    public static void addReplacements(Map<String, String> replacements, long secondsTotal) {
         long days = TimeUnit.SECONDS.toDays(secondsTotal);
         long hoursNoDays = TimeUnit.SECONDS.toHours(secondsTotal);
         long hours = TimeUnit.DAYS.toHours(days) - hoursNoDays;
