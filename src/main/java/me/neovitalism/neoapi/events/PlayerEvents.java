@@ -7,14 +7,21 @@ import net.fabricmc.fabric.api.event.EventFactory;
 public class PlayerEvents {
     public static final Event<EventInterfaces.PlayerJoinEvent> JOIN = EventFactory.createArrayBacked(
             EventInterfaces.PlayerJoinEvent.class, (listeners) -> (player, firstJoin) -> {
-                for (EventInterfaces.PlayerJoinEvent listener : listeners) {
+                for(EventInterfaces.PlayerJoinEvent listener : listeners) {
                     listener.interact(player, firstJoin);
+                }
+            });
+
+    public static final Event<EventInterfaces.PlayerQuitEvent> QUIT = EventFactory.createArrayBacked(
+            EventInterfaces.PlayerQuitEvent.class, (listeners) -> (player) -> {
+                for(EventInterfaces.PlayerQuitEvent listener : listeners) {
+                    listener.interact(player);
                 }
             });
 
     public static final Event<EventInterfaces.PlayerMoveEvent> MOVE = EventFactory.createArrayBacked(
             EventInterfaces.PlayerMoveEvent.class, (listeners) -> (player, oldLocation, newLocation) -> {
-                for (EventInterfaces.PlayerMoveEvent listener : listeners) {
+                for(EventInterfaces.PlayerMoveEvent listener : listeners) {
                     Location alteredLocation = listener.interact(player, oldLocation, newLocation);
                     if(!alteredLocation.isEqualTo(newLocation)) {
                         return alteredLocation;
@@ -28,7 +35,7 @@ public class PlayerEvents {
      */
     public static final Event<EventInterfaces.PlayerOffhandSwapEvent> OFFHAND_SWAP = EventFactory.createArrayBacked(
             EventInterfaces.PlayerOffhandSwapEvent.class, (listeners) -> (player, mainHandItem, offHandItem) -> {
-                for (EventInterfaces.PlayerOffhandSwapEvent listener : listeners) {
+                for(EventInterfaces.PlayerOffhandSwapEvent listener : listeners) {
                     if(!listener.interact(player, mainHandItem, offHandItem)) return false;
                 }
                 return true;

@@ -17,11 +17,15 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+
+import java.time.Instant;
 
 @Mixin(ServerPlayNetworkHandler.class)
 public abstract class ServerPlayNetworkHandlerMixin {
@@ -108,10 +112,10 @@ public abstract class ServerPlayNetworkHandlerMixin {
     }
 
     @Inject(method = "onPlayerInteractItem",
-            at = @At(target = "Lnet/minecraft/server/network/ServerPlayerEntity;updateLastActionTime()V",
-                    value = "TAIL"), cancellable = true, locals = LocalCapture.CAPTURE_FAILSOFT)
-    public void neoAPI$onInteractItem(PlayerInteractItemC2SPacket packet, CallbackInfo ci, ServerWorld serverWorld, Hand hand, ItemStack itemStack) {
-        if(!PlayerEvents.INTERACT_ITEM.invoker().interact(player, hand)) {
+            at = @At(target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;updateSequence(I)V",
+                value = "INVOKE"), cancellable = true)
+    public void neoAPI$onInteractItem(PlayerInteractItemC2SPacket packet, CallbackInfo ci) {
+        if(!PlayerEvents.INTERACT_ITEM.invoker().interact(player, packet.getHand())) {
             ci.cancel();
         }
     }
@@ -153,5 +157,14 @@ public abstract class ServerPlayNetworkHandlerMixin {
         if(!PlayerEvents.PADDLE_BOAT.invoker().interact(player, (BoatEntity) entity)) {
             ci.cancel();
         }
+    }
+
+    /**
+     * @author Neovitalism
+     * @reason Fuck this kick
+     */
+    @Overwrite
+    private boolean isInProperOrder(Instant timestamp) {
+        return true;
     }
 }

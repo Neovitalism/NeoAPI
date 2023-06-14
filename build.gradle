@@ -42,6 +42,10 @@ java {
     withSourcesJar()
 }
 
+runClient {
+    args("--username=NeoDev")
+}
+
 jar {
     from("LICENSE") {
         rename { "${it}_${project.archivesBaseName}"}

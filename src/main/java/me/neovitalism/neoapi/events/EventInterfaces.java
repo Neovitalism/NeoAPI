@@ -14,6 +14,10 @@ public class EventInterfaces {
         void interact(ServerPlayerEntity player, boolean firstJoin);
     }
 
+    public interface PlayerQuitEvent {
+        void interact(ServerPlayerEntity player);
+    }
+
     public interface PlayerMoveEvent {
         Location interact(ServerPlayerEntity player, Location oldLocation, Location newLocation);
     }

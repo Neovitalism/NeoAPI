@@ -52,6 +52,9 @@ public abstract class NeoMod implements ModInitializer {
                 PlayerEvents.JOIN.invoker().interact(handler.getPlayer(), joinedBefore);
                 if(!joinedBefore) PlayerManager.addTag(handler.getPlayer(), "neoapi.joinedBefore");
             });
+            ServerPlayConnectionEvents.DISCONNECT.register(((handler, server) -> {
+                PlayerEvents.QUIT.invoker().interact(handler.getPlayer());
+            }));
             ServerLifecycleEvents.SERVER_STARTED.register(server -> {
                 WorldManager.mapWorlds(server);
                 registerPermissionProvider();
