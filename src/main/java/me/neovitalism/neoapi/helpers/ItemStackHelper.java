@@ -1,6 +1,7 @@
 package me.neovitalism.neoapi.helpers;
 
 import me.neovitalism.neoapi.modloading.config.Configuration;
+import me.neovitalism.neoapi.utils.ChatUtil;
 import me.neovitalism.neoapi.utils.ColorUtil;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
@@ -13,6 +14,7 @@ import net.minecraft.util.registry.Registry;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class ItemStackHelper {
     public static Identifier getIdentifier(Item item) {
@@ -69,6 +71,47 @@ public class ItemStackHelper {
             if(nbtConfig != null) {
                 for(String nbtKey : nbtConfig.getKeys()) {
                     addNBT(itemStack, nbtKey, nbtConfig.get(nbtKey));
+                }
+            }
+            return itemStack;
+        } else return null;
+    }
+
+    public static ItemStack fromConfig(Configuration itemConfig, int amount, Map<String, String> replacements) {
+        Item item = Registry.ITEM.get(Identifier.tryParse(itemConfig.getString("Material")));
+        if(item != Items.AIR) {
+            ItemStack itemStack = new ItemStack(item);
+            String name = ChatUtil.replaceReplacements(itemConfig.getString("Name"),replacements);
+            if(name != null) itemStack.setCustomName(ColorUtil.parseItemName(name));
+            List<String> lore = itemConfig.getStringList("Lore");
+            for(int i = 0; i < lore.size(); i++) {
+                lore.set(i, ChatUtil.replaceReplacements(lore.get(i), replacements));
+            }
+            setLore(itemStack, lore);
+            itemStack.setCount((amount == -1) ? itemConfig.getInt("Amount", 1) : amount);
+            List<String> enchants = itemConfig.getStringList("Enchants");
+            for(String enchant : enchants) {
+                String[] enchantParsed = enchant.split(" ");
+                if(enchantParsed.length != 2) continue;
+                Identifier enchantID = Identifier.tryParse(enchantParsed[0]);
+                Enchantment enchantment = Registry.ENCHANTMENT.get(enchantID);
+                if(enchantment == null) continue;
+                int level;
+                try {
+                    level = Integer.parseInt(enchantParsed[1]);
+                } catch (NumberFormatException e) {
+                    continue;
+                }
+                itemStack.addEnchantment(enchantment, level);
+            }
+            Configuration nbtConfig = itemConfig.getSection("NBT");
+            if(nbtConfig != null) {
+                for(String nbtKey : nbtConfig.getKeys()) {
+                    Object nbtValue = nbtConfig.get(nbtKey);
+                    if(nbtValue instanceof String) {
+                        nbtValue = ChatUtil.replaceReplacements((String) nbtValue,replacements);
+                    }
+                    addNBT(itemStack, nbtKey, nbtValue);
                 }
             }
             return itemStack;
