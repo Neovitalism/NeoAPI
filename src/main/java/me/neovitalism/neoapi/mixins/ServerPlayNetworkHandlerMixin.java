@@ -3,6 +3,8 @@ package me.neovitalism.neoapi.mixins;
 import me.neovitalism.neoapi.events.EventInterfaces;
 import me.neovitalism.neoapi.events.PlayerEvents;
 import me.neovitalism.neoapi.objects.Location;
+import me.neovitalism.neoapi.screens.ClickType;
+import me.neovitalism.neoapi.screens.NeoAPIScreenHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.item.ItemStack;
@@ -21,7 +23,6 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
@@ -34,13 +35,13 @@ public abstract class ServerPlayNetworkHandlerMixin {
     @Inject(method = "onPlayerMove",
             at = @At(value = "HEAD"), cancellable = true)
     public void neoAPI$onPlayerMove(PlayerMoveC2SPacket packet, CallbackInfo ci) {
-        Location oldLocation = new Location(player.getWorld(), player.getX(), player.getY(), player.getZ(), player.getPitch(), player.getYaw());
+        Location oldLocation = new Location(player.getServerWorld(), player.getX(), player.getY(), player.getZ(), player.getPitch(), player.getYaw());
         double x = MathHelper.clamp(packet.getX(this.player.getX()), -3.0E7D, 3.0E7D);
         double y = MathHelper.clamp(packet.getY(this.player.getY()), -2.0E7D, 2.0E7D);
         double z = MathHelper.clamp(packet.getZ(this.player.getZ()), -3.0E7D, 3.0E7D);
         float yaw = MathHelper.wrapDegrees(packet.getYaw(this.player.getYaw()));
         float pitch = MathHelper.wrapDegrees(packet.getPitch(this.player.getPitch()));
-        Location newLocation = new Location(player.getWorld(), x, y, z, pitch, yaw);
+        Location newLocation = new Location(player.getServerWorld(), x, y, z, pitch, yaw);
         Location alteredLocation = PlayerEvents.MOVE.invoker().interact(player, oldLocation, newLocation);
         if(!alteredLocation.isEqualTo(newLocation)) {
             alteredLocation.teleport(player);
@@ -73,7 +74,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
             at = @At(target = "Lnet/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket;handle(Lnet/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$Handler;)V",
                     value = "INVOKE"), cancellable = true)
     public void neoAPI$onInteractEntity(PlayerInteractEntityC2SPacket packet, CallbackInfo ci) {
-        Entity entity = packet.getEntity(player.getWorld());
+        Entity entity = packet.getEntity(player.getServerWorld());
         if(entity != null) {
             final EventInterfaces.PlayerInteractEntityEvent.InteractType[] interactType = new EventInterfaces.PlayerInteractEntityEvent.InteractType[1];
             final Hand[] usedHand = new Hand[1];
@@ -156,6 +157,21 @@ public abstract class ServerPlayNetworkHandlerMixin {
     public void neoAPI$onBoatPaddle(BoatPaddleStateC2SPacket packet, CallbackInfo ci, Entity entity) {
         if(!PlayerEvents.PADDLE_BOAT.invoker().interact(player, (BoatEntity) entity)) {
             ci.cancel();
+        }
+    }
+
+    @Inject(method = "onClickSlot",
+            at = @At(target = "Lnet/minecraft/server/network/ServerPlayerEntity;updateLastActionTime()V",
+                    value = "INVOKE"), cancellable = true)
+    public void neoAPI$onClickSlot(ClickSlotC2SPacket packet, CallbackInfo ci) {
+        if(this.player.currentScreenHandler instanceof NeoAPIScreenHandler neoAPIScreenHandler) {
+
+            int slot = packet.getSlot();
+            int button = packet.getButton();
+            if(slot == -999) button += 100;
+            ClickType clickType = ClickType.toClickType(packet.getActionType(), button);
+
+
         }
     }
 

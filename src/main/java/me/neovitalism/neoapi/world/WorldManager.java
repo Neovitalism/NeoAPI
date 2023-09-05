@@ -42,6 +42,7 @@ public final class WorldManager {
         return worldNameMap.get(getWorldUUID(world));
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private static void loadOrSetWorldNames() {
         Configuration config = null;
         File configFolder = FabricLoader.getInstance().getConfigDir().resolve("NeoAPI").toFile();

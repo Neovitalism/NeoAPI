@@ -9,6 +9,6 @@ public class LocationUtil {
     public static Location getLookingAt(ServerPlayerEntity player) {
         HitResult hitResult = player.raycast(500, 0, false);
         Vec3d target = hitResult.getPos();
-        return new Location(player.getWorld(), target.x, target.y, target.z);
+        return new Location(player.getServerWorld(), target.x, target.y, target.z);
     }
 }

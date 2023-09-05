@@ -48,7 +48,7 @@ public abstract class NeoMod implements ModInitializer {
                 AsynchronousHelper.shutdown();
             });
             ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-                boolean joinedBefore = PlayerManager.getFirstJoinTag(handler.getPlayer());
+                boolean joinedBefore = PlayerManager.containsTag(handler.getPlayer(),"neoapi.joinedBefore");
                 PlayerEvents.JOIN.invoker().interact(handler.getPlayer(), joinedBefore);
                 if(!joinedBefore) PlayerManager.addTag(handler.getPlayer(), "neoapi.joinedBefore");
             });

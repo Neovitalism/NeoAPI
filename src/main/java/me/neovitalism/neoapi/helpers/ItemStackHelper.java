@@ -8,9 +8,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.*;
+import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 import java.util.List;
 import java.util.Locale;
@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class ItemStackHelper {
     public static Identifier getIdentifier(Item item) {
-        return Registry.ITEM.getId(item);
+        return Registries.ITEM.getId(item);
     }
 
     public static Identifier getIdentifier(ItemStack item) {
@@ -44,7 +44,7 @@ public class ItemStackHelper {
     }
 
     public static ItemStack fromConfig(Configuration itemConfig, int amount) {
-        Item item = Registry.ITEM.get(Identifier.tryParse(itemConfig.getString("Material")));
+        Item item = Registries.ITEM.get(Identifier.tryParse(itemConfig.getString("Material")));
         if(item != Items.AIR) {
             ItemStack itemStack = new ItemStack(item);
             String name = itemConfig.getString("Name");
@@ -57,7 +57,7 @@ public class ItemStackHelper {
                 String[] enchantParsed = enchant.split(" ");
                 if(enchantParsed.length != 2) continue;
                 Identifier enchantID = Identifier.tryParse(enchantParsed[0]);
-                Enchantment enchantment = Registry.ENCHANTMENT.get(enchantID);
+                Enchantment enchantment = Registries.ENCHANTMENT.get(enchantID);
                 if(enchantment == null) continue;
                 int level;
                 try {
@@ -78,7 +78,7 @@ public class ItemStackHelper {
     }
 
     public static ItemStack fromConfig(Configuration itemConfig, int amount, Map<String, String> replacements) {
-        Item item = Registry.ITEM.get(Identifier.tryParse(itemConfig.getString("Material")));
+        Item item = Registries.ITEM.get(Identifier.tryParse(itemConfig.getString("Material")));
         if(item != Items.AIR) {
             ItemStack itemStack = new ItemStack(item);
             String name = ChatUtil.replaceReplacements(itemConfig.getString("Name"),replacements);
@@ -94,7 +94,7 @@ public class ItemStackHelper {
                 String[] enchantParsed = enchant.split(" ");
                 if(enchantParsed.length != 2) continue;
                 Identifier enchantID = Identifier.tryParse(enchantParsed[0]);
-                Enchantment enchantment = Registry.ENCHANTMENT.get(enchantID);
+                Enchantment enchantment = Registries.ENCHANTMENT.get(enchantID);
                 if(enchantment == null) continue;
                 int level;
                 try {
