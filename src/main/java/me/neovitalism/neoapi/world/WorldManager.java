@@ -32,6 +32,21 @@ public final class WorldManager {
         return worldMap.get(worldUUID);
     }
 
+    @Nullable
+    public static ServerWorld getWorldByName(String name) {
+        for(Map.Entry<UUID, String> worldName : worldNameMap.entrySet()) {
+            if(name.equals(worldName.getValue())) return worldMap.get(worldName.getKey());
+        }
+        return null;
+    }
+
+    @Nullable
+    public static UUID getWorldUUIDbyName(String name) {
+        ServerWorld namedWorld = getWorldByName(name);
+        if(namedWorld == null) return null;
+        return getWorldUUID(namedWorld);
+    }
+
     @NotNull
     public static UUID getWorldUUID(ServerWorld world) {
         return WorldUUIDState.getOrCreateWorldUUID(world);
