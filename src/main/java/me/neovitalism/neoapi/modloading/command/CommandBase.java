@@ -2,27 +2,27 @@ package me.neovitalism.neoapi.modloading.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.tree.CommandNode;
-import com.mojang.brigadier.tree.LiteralCommandNode;
-import me.neovitalism.neoapi.modloading.NeoMod;
+import me.neovitalism.neoapi.permissions.NeoPermission;
 import net.minecraft.server.command.ServerCommandSource;
 
 import static net.minecraft.server.command.CommandManager.literal;
 
-public interface CommandBase {
-    String[] getCommandAliases();
+public abstract class CommandBase {
+    public CommandBase(CommandDispatcher<ServerCommandSource> dispatcher, String... aliases) {
+        for (String alias : aliases) dispatcher.register(this.getCommand(alias));
+    }
 
-    LiteralCommandNode<ServerCommandSource> register(NeoMod instance, CommandDispatcher<ServerCommandSource> dispatcher);
+    public abstract NeoPermission[] getBasePermissions();
 
-    default void registerAliases(CommandDispatcher<ServerCommandSource> dispatcher, LiteralCommandNode<ServerCommandSource> command) {
-        for(String alias : getCommandAliases()) {
-            LiteralArgumentBuilder<ServerCommandSource> builder = literal(alias)
-                    .requires(command.getRequirement())
-                    .executes(command.getCommand());
-            for(CommandNode<ServerCommandSource> child : command.getChildren()) {
-                builder.then(child);
-            }
-            dispatcher.register(builder);
-        }
+    public abstract LiteralArgumentBuilder<ServerCommandSource> getCommand(LiteralArgumentBuilder<ServerCommandSource> command);
+
+    private LiteralArgumentBuilder<ServerCommandSource> getCommand(String commandName) {
+        return this.getCommand(literal(commandName)
+                .requires(source -> {
+                    NeoPermission[] basePermissions = this.getBasePermissions();
+                    if (basePermissions.length == 0) return true;
+                    for (NeoPermission permission : basePermissions) if (permission.matches(source)) return true;
+                    return false;
+                }));
     }
 }

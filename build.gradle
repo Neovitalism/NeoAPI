@@ -1,15 +1,14 @@
 plugins {
-    id 'fabric-loom' version '1.0-SNAPSHOT'
+    id 'fabric-loom' version '1.8-SNAPSHOT'
     id 'maven-publish'
-    id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+sourceCompatibility = JavaVersion.VERSION_21
+targetCompatibility = JavaVersion.VERSION_21
 
-archivesBaseName = 'NeoAPI'
 version = "${project.mod_version}"
-group = 'me.neovitalism.neoapi'
+group = 'me.neovitalism'
 
 repositories {
     mavenCentral()
@@ -19,37 +18,27 @@ dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-    implementation 'net.kyori:adventure-text-minimessage:4.14.0'
-    implementation "net.kyori:adventure-text-serializer-gson:4.14.0"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+    implementation 'net.kyori:adventure-text-minimessage:4.17.0'
+    implementation "net.kyori:adventure-text-serializer-gson:4.17.0"
     shadow(implementation (group: 'org.yaml', name: 'snakeyaml', version: '2.0'))
-    modImplementation include("net.kyori:adventure-platform-fabric:5.8.0")
+    modImplementation include("net.kyori:adventure-platform-fabric:5.14.1")
     compileOnly 'net.luckperms:api:5.4'
 }
 
+Map<String, String> resourceProperties = new HashMap<>();
+resourceProperties.put("version", (String) project.mod_version)
+resourceProperties.put("loader_version", project.loader_version)
+resourceProperties.put("minecraft_version", project.minecraft_version)
+
 processResources {
-    inputs.property "version", project.version
     filesMatching("fabric.mod.json") {
-        expand "version": project.version
+        expand resourceProperties
     }
 }
 
 tasks.withType(JavaCompile).configureEach {
-    it.options.release = 17
-}
-
-java {
-    withSourcesJar()
-}
-
-runClient {
-    args("--username=NeoDev")
-}
-
-jar {
-    from("LICENSE") {
-        rename { "${it}_${project.archivesBaseName}"}
-    }
+    it.options.release = 21
 }
 
 shadowJar {
@@ -60,4 +49,15 @@ shadowJar {
 remapJar {
     dependsOn(shadowJar)
     inputFile = tasks.shadowJar.archiveFile
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'me.neovitalism'
+            artifactId = 'NeoAPI'
+            version = "${project.version}"
+            artifact(remapJar)
+        }
+    }
 }

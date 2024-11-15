@@ -1,5 +1,6 @@
 package me.neovitalism.neoapi.utils;
 
+import me.neovitalism.neoapi.NeoAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -16,24 +17,55 @@ public final class ColorUtil {
     private static final Pattern LEGACY_PATTERN = Pattern.compile("[&§]([0-9a-fA-fk-oK-OrR])");
 
     public static Component parseColour(String input) {
-        input = replaceCodes(input);
-        return MiniMessage.miniMessage().deserialize(input);
+        return MiniMessage.miniMessage().deserialize(ColorUtil.replaceCodes(input));
+    }
+    
+    public static Text toText(Component component) {
+        return ColorUtil.fromJson(ColorUtil.toJson(component));
+    }
+
+    public static String toJson(Text text) {
+        return Text.Serialization.toJsonString(text, NeoAPI.getServer().getRegistryManager());
+    }
+
+    public static Text fromJson(String json) {
+        return Text.Serialization.fromJson(json, NeoAPI.getServer().getRegistryManager());
+    }
+
+    public static String toJson(Component component) {
+        return GsonComponentSerializer.gson().serialize(component);
+    }
+
+    public static Text parseColourToText(String input) {
+        return ColorUtil.toText(ColorUtil.parseColour(input));
+    }
+
+    public static Text parseItemName(String name) {
+        Text text = ColorUtil.parseColourToText(name);
+        Component fullComponent = Component.empty();
+        for (Text loopText : text.getWithStyle(Style.EMPTY)) {
+            Style style = loopText.getStyle();
+            Component component = loopText.asComponent();
+            if (!style.isItalic()) component = component.decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE);
+            fullComponent = fullComponent.append(component);
+        }
+        return ColorUtil.toText(fullComponent);
     }
 
     private static String replaceCodes(String input) {
-        Matcher matcher = HEX_PATTERN.matcher(input);
+        Matcher matcher = ColorUtil.HEX_PATTERN.matcher(input);
         while (matcher.find()) {
             input = input.replace(matcher.group(), "<reset><c:" + matcher.group().substring(1) + ">");
-            matcher = HEX_PATTERN.matcher(input);
+            matcher = ColorUtil.HEX_PATTERN.matcher(input);
         }
-        return replaceLegacyCodes(input);
+        return ColorUtil.replaceLegacyCodes(input);
     }
 
     private static String replaceLegacyCodes(String input) {
-        Matcher matcher = LEGACY_PATTERN.matcher(input);
+        Matcher matcher = ColorUtil.LEGACY_PATTERN.matcher(input);
         while (matcher.find()) {
-            input = input.replace(matcher.group(), getLegacyReplacement(matcher.group().substring(1)));
-            matcher = LEGACY_PATTERN.matcher(input);
+            input = input.replace(matcher.group(), ColorUtil.getLegacyReplacement(matcher.group().substring(1)));
+            matcher = ColorUtil.LEGACY_PATTERN.matcher(input);
         }
         return input;
     }
@@ -64,43 +96,5 @@ public final class ColorUtil {
             case "R" -> "<reset>";
             default -> input;
         };
-    }
-    
-    public static Text toText(Component component) {
-        return Text.Serializer.fromJson(GsonComponentSerializer.gson().serialize(component));
-    }
-
-    public static Text parseColourToText(String input) {
-        return toText(parseColour(input));
-    }
-
-    public static Text parseItemName(String name) {
-        Text text = parseColourToText(name);
-        Component fullComponent = Component.empty();
-        for(Text loopText : text.getWithStyle(Style.EMPTY)) {
-            Style style = loopText.getStyle();
-            Component component = loopText.asComponent();
-            if(!style.isItalic()) component = component.decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE);
-            fullComponent = fullComponent.append(component);
-        }
-        return toText(fullComponent);
-    }
-
-    public static String serialize(Component component) {
-        return MiniMessage.miniMessage().serialize(component);
-    }
-
-    public static String serializeWithoutLeadingSpaces(Text text) {
-        boolean passedFirst = false;
-        Component returnComponent = Component.empty();
-        for(Text loopText : text.getWithStyle(Style.EMPTY)) {
-            if(!passedFirst) {
-                String firstText = loopText.getString();
-                if(firstText.isEmpty() || firstText.isBlank()) continue;
-            }
-            passedFirst = true;
-            returnComponent = returnComponent.append(loopText.asComponent());
-        }
-        return serialize(returnComponent);
     }
 }

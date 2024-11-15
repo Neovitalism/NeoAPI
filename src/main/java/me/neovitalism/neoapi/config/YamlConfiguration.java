@@ -1,4 +1,4 @@
-package me.neovitalism.neoapi.modloading.config;
+package me.neovitalism.neoapi.config;
 
 import com.google.common.base.Charsets;
 import org.yaml.snakeyaml.DumperOptions;

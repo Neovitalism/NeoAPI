@@ -1,25 +1,17 @@
 package me.neovitalism.neoapi.modloading;
 
-import me.neovitalism.neoapi.NeoAPI;
-import me.neovitalism.neoapi.events.PlayerEvents;
-import me.neovitalism.neoapi.helpers.AsynchronousHelper;
-import me.neovitalism.neoapi.lang.LangManager;
-import me.neovitalism.neoapi.modloading.config.Configuration;
-import me.neovitalism.neoapi.modloading.config.YamlConfiguration;
-import me.neovitalism.neoapi.modloading.permission.DefaultPermissionManager;
-import me.neovitalism.neoapi.modloading.permission.LuckPermsPermissionManager;
-import me.neovitalism.neoapi.modloading.permission.PermissionManager;
-import me.neovitalism.neoapi.player.PlayerManager;
-import me.neovitalism.neoapi.world.WorldManager;
+import com.mojang.brigadier.CommandDispatcher;
+import me.neovitalism.neoapi.config.Configuration;
+import me.neovitalism.neoapi.config.YamlConfiguration;
+import me.neovitalism.neoapi.modloading.command.CommandRegistryInfo;
+import me.neovitalism.neoapi.modloading.logging.NeoModLogger;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.kyori.adventure.platform.fabric.FabricServerAudiences;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.command.CommandRegistryAccess;
+import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -29,132 +21,82 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public abstract class NeoMod implements ModInitializer {
+    private final NeoModLogger logger = new NeoModLogger(this.getModID());
+
     public abstract String getModID();
     public abstract String getModPrefix();
-    public abstract LangManager getLangManager();
 
-    public NeoMod() {
-        if(!registered) {
-            ServerLifecycleEvents.SERVER_STARTING.register(server -> {
-                adventure = FabricServerAudiences.of(server);
-                NeoMod.server = server;
-            });
-            ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
-                adventure = null;
-                NeoMod.server = null;
-                registered = false;
-                permissionProvider = null;
-                AsynchronousHelper.shutdown();
-            });
-            ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-                boolean joinedBefore = PlayerManager.containsTag(handler.getPlayer(),"neoapi.joinedBefore");
-                PlayerEvents.JOIN.invoker().interact(handler.getPlayer(), joinedBefore);
-                if(!joinedBefore) PlayerManager.addTag(handler.getPlayer(), "neoapi.joinedBefore");
-            });
-            ServerPlayConnectionEvents.DISCONNECT.register(((handler, server) -> {
-                PlayerEvents.QUIT.invoker().interact(handler.getPlayer());
-            }));
-            ServerLifecycleEvents.SERVER_STARTED.register(server -> {
-                WorldManager.mapWorlds(server);
-                registerPermissionProvider();
-            });
-            registered = true;
-        }
-        ServerLifecycleEvents.SERVER_STARTED.register(server -> configManager());
+    @Override
+    public void onInitialize() {
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> this.configManager());
+        CommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess, environment) ->
+                this.registerCommands(new CommandRegistryInfo(dispatcher, registryAccess, environment))));
     }
-
-    private static boolean registered = false;
-
-    private static FabricServerAudiences adventure = null;
-    public FabricServerAudiences adventure() {
-        if(adventure == null) {
-            throw new IllegalStateException("Tried to access Adventure without a running server!");
-        }
-        return adventure;
-    }
-
-    private static MinecraftServer server = null;
-
-    public MinecraftServer getServer() {
-        return server;
-    }
-
-    public Configuration getDefaultConfig() {
-        return getConfig("config.yml");
-    }
-
-    public void saveConfig(File file, Configuration config) {
-        try {
-        YamlConfiguration.save(config, file);
-        } catch(IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public Configuration getConfig(String fileName) {
-        Configuration config = null;
-        try {
-            config = YamlConfiguration.loadConfiguration(getOrCreateConfigurationFile(fileName));
-        } catch(IOException e) {
-            e.printStackTrace();
-        }
-        return config;
-    }
-
-    public File getOrCreateConfigurationFile(String fileName) throws IOException {
-        File configFolder = FabricLoader.getInstance().getConfigDir().resolve(getModID()).toFile();
-        if (!configFolder.exists()) {
-            configFolder.mkdirs();
-        }
-        File configFile = new File(configFolder, fileName);
-        if (!configFile.exists()) {
-            FileOutputStream outputStream = new FileOutputStream(configFile);
-            Path path = Paths.get(getModID().toLowerCase(Locale.ENGLISH), fileName);
-            InputStream in = getClass().getClassLoader().getResourceAsStream(path.toString().replace("\\", "/"));
-            in.transferTo(outputStream);
-        }
-        return configFile;
-    }
-
-    public abstract void onInitialize();
 
     public abstract void configManager();
 
-    private static PermissionManager permissionProvider = null;
+    public abstract void registerCommands(CommandRegistryInfo info);
 
-    private static void registerPermissionProvider() {
+    public NeoModLogger getLogger() {
+        return this.logger;
+    }
+
+    public File getDataFolder() {
+        File folder = FabricLoader.getInstance().getConfigDir().resolve(this.getModID()).toFile();
+        if (!folder.exists()) folder.mkdirs();
+        return folder;
+    }
+
+    public File getFile(String fileName) {
+        File file = new File(this.getDataFolder(), fileName);
+        if (!file.exists()) file.getParentFile().mkdirs();
+        return file;
+    }
+
+    public Configuration getConfig(String fileName, boolean saveResource) {
+        File configFile = this.getFile(fileName);
+        if (!configFile.exists()) {
+            if (!saveResource) return null;
+            this.saveResource(fileName, false);
+        }
+        return this.getConfig(configFile);
+    }
+
+    public Configuration getConfig(File configFile) {
         try {
-            Class.forName("net.luckperms.api.LuckPerms");
-            permissionProvider = new LuckPermsPermissionManager();
-            NeoAPI.LOGGER.info("Found LuckPerms! Permission support enabled.");
-        } catch(ClassNotFoundException e) {
-            permissionProvider = new DefaultPermissionManager();
-            NeoAPI.LOGGER.warn("Couldn't find LuckPerms.. falling back to permission levels.");
+            return YamlConfiguration.loadConfiguration(configFile); // ?
+        } catch (IOException e) {
+            this.logger.error("Something went wrong getting the config: " + configFile.getName() + ".");
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void saveConfig(String fileName, Configuration config) {
+        File file = this.getFile(fileName);
+        try {
+            YamlConfiguration.save(config, file);
+        } catch (IOException e) {
+            this.logger.error("Something went wrong saving the config: " + fileName + ".");
+            e.printStackTrace();
         }
     }
 
-    public static boolean checkForPermission(ServerCommandSource source, String permission, int level) {
-        if(source.getPlayer() != null) {
-            return permissionProvider.checkForPermission(source.getPlayer(), permission, level);
-        } else return true;
-    }
-
-    public static String checkMetaPermission(ServerCommandSource source, String metaKey) {
-        if(source.getPlayer() != null) {
-            return permissionProvider.getMetaPermission(source.getPlayer(), metaKey);
-        } else return null;
-    }
-
-    public static boolean checkForPermission(@NotNull ServerPlayerEntity player, String permission, int level) {
-        return permissionProvider.checkForPermission(player, permission, level);
-    }
-
-    public static boolean checkForPermission(@NotNull ServerPlayerEntity player, String permission) {
-        return permissionProvider.checkForPermission(player, permission);
-    }
-
-    public static String checkMetaPermission(@NotNull ServerPlayerEntity player, String metaKey) {
-        return permissionProvider.getMetaPermission(player, metaKey);
+    public void saveResource(String fileName, boolean overwrite) {
+        File file = this.getFile(fileName);
+        if (file.exists() && !overwrite) return;
+        try {
+            FileOutputStream outputStream = new FileOutputStream(file);
+            Path path = Paths.get(getModID().toLowerCase(Locale.ENGLISH), fileName);
+            InputStream in = this.getClass().getClassLoader().getResourceAsStream(path
+                    .toString().replace("\\", "/"));
+            assert in != null;
+            in.transferTo(outputStream);
+        } catch (IOException e) {
+            this.logger.error("Something went wrong saving the resource: " + fileName + ".");
+            e.printStackTrace();
+        }
     }
 }

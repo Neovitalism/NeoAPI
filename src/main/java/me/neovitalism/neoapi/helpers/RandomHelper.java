@@ -1,33 +1,36 @@
 package me.neovitalism.neoapi.helpers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
 public class RandomHelper {
-    public static int randomIntBetween(int low, int high) {
-        return new Random().nextInt((high - low) + 1) + low;
+    private static final Random RANDOM = new Random();
+
+    public static boolean oneIn(int amount) {
+        if (amount < 1) amount = 1;
+        return RandomHelper.RANDOM.nextInt(amount) == 0;
+    }
+
+    public static int numberBetween(int min, int max) {
+        return RandomHelper.RANDOM.nextInt(max - min + 1) + min;
+    }
+
+    public static <T> T getRandomValue(List<T> list) {
+        if (list.isEmpty()) return null;
+        return list.get(RandomHelper.RANDOM.nextInt(list.size()));
     }
 
     public static <T> T getWeightedResult(Map<T, Double> weightedObjects) {
-        List<T> objects = weightedObjects.keySet().stream().toList();
-        List<Double> weights = weightedObjects.values().stream().toList();
         double sum = 0;
-        for (double weight : weights) {
-            sum += weight;
-        }
-        double random = (Math.random() * sum);
-        for(int i=0; i<weights.size(); i++) {
-            if(random < weights.get(i)) {
-                return objects.get(i);
-            } else {
-                random -= weights.get(i);
-            }
+        for (double weight : weightedObjects.values()) sum += weight;
+        double random = (RandomHelper.RANDOM.nextDouble() * sum);
+        for (Map.Entry<T, Double> entry : weightedObjects.entrySet()) {
+            if (random < entry.getValue()) return entry.getKey();
+            random -= entry.getValue();
         }
         return null;
     }
 
-    public static boolean getRandomChance(int outOf) {
-        return randomIntBetween(1, outOf) == 1;
-    }
 }
