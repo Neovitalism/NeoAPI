@@ -72,7 +72,7 @@ public class ItemHelper {
     }
 
     public static void setDisplayName(ItemStack item, String name) {
-        item.set(DataComponentTypes.ITEM_NAME, (name != null) ? ColorUtil.parseItemName(name) : null);
+        item.set(DataComponentTypes.ITEM_NAME, (name != null) ? ColorUtil.parseColourToText(name) : null);
     }
 
     public static void setLore(ItemStack item, List<String> lore) {

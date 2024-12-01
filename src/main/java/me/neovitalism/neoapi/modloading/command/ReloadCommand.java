@@ -37,9 +37,9 @@ public class ReloadCommand extends CommandBase {
         return command.then(literal("reload")
                 .requires(this.getReloadPermission()::matches)
                 .executes(context -> {
-                    instance.configManager();
+                    this.instance.configManager();
                     context.getSource().sendMessage(ColorUtil.parseColour(
-                            instance.getModPrefix() + "&aReloaded!"));
+                            this.instance.getModPrefix() + "&aReloaded!"));
                     return Command.SINGLE_SUCCESS;
                 }));
     }

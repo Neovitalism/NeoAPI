@@ -55,7 +55,7 @@ public class NeoAPI implements ModInitializer {
             this.permissionProvider = new LuckPermsPermissionProvider();
             NeoAPI.LOGGER.info("Found LuckPerms! Permission support enabled.");
             return;
-        } catch(ClassNotFoundException ignored) {}
+        } catch (ClassNotFoundException ignored) {}
         this.permissionProvider = new DefaultPermissionProvider();
         NeoAPI.LOGGER.warn("Couldn't find LuckPerms.. falling back to permission levels.");
     }

@@ -1,20 +1,28 @@
 package me.neovitalism.neoapi.utils;
 
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 public final class TimeUtil {
-    public static long tryParse(String input) {
-        String[] split = input.split("-");
-        if (split.length != 2) return -1;
-        long time;
+    private static final String TIME_REGEX = "(([0-9]+)-?h(ours?)?)?-?(([0-9]+)-?m(inutes?)?)?-?(([0-9]+)-?s(econds?)?)?";
+
+    public static long parseSeconds(String input) {
         try {
-            time = Long.parseLong(split[0]);
-        } catch (NumberFormatException e) {
+            long minutes = Long.parseLong(input);
+            return minutes * 60;
+        } catch(NumberFormatException ignored) {}
+        String charactersLeft = input.replaceAll(TimeUtil.TIME_REGEX, "");
+        if (!charactersLeft.isEmpty()) return -1;
+        String hourString = input.replaceAll(TimeUtil.TIME_REGEX, "$2");
+        String minuteString = input.replaceAll(TimeUtil.TIME_REGEX, "$5");
+        String secondString = input.replaceAll(TimeUtil.TIME_REGEX, "$8");
+        try {
+            long hours = (hourString.isEmpty()) ? 0 : Long.parseLong(hourString);
+            long minutes = (minuteString.isEmpty()) ? (hours * 60) : Long.parseLong(minuteString) + (hours*60);
+            return (secondString.isEmpty()) ? (minutes * 60) : Long.parseLong(secondString) + (minutes*60);
+        } catch(NumberFormatException e) {
             return -1;
         }
-        String timeUnit = split[1];
-        if (timeUnit.replaceFirst("seconds?", "").isEmpty()) return time;
-        if (timeUnit.replaceFirst("minutes?", "").isEmpty()) return time*60;
-        if (timeUnit.replaceFirst("hours?", "").isEmpty()) return time*3600;
-        return -1;
     }
 
     public static String getFormattedTime(long seconds) {
@@ -61,5 +69,18 @@ public final class TimeUtil {
         timeString.append(newSeconds).append(" second");
         if (newSeconds == 0 || newSeconds > 1) timeString.append("s");
         return timeString.toString();
+    }
+
+    public static void addReplacements(long seconds, Map<String, String> replacements) {
+        long days = TimeUnit.SECONDS.toDays(seconds);
+        long hoursNoDays = TimeUnit.SECONDS.toHours(seconds);
+        long hours = TimeUnit.DAYS.toHours(days) - hoursNoDays;
+        long minutes = TimeUnit.SECONDS.toMinutes(seconds) - TimeUnit.HOURS.toMinutes(hoursNoDays);
+        long secondsLeft = seconds - TimeUnit.HOURS.toSeconds(hoursNoDays) - TimeUnit.MINUTES.toSeconds(minutes);
+        replacements.put("{days}", String.valueOf(days));
+        replacements.put("{hours-no-days}", String.valueOf(hoursNoDays));
+        replacements.put("{hours}", String.valueOf(hours));
+        replacements.put("{minutes}", String.valueOf(minutes));
+        replacements.put("{seconds}", String.valueOf(secondsLeft));
     }
 }
