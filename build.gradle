@@ -26,8 +26,8 @@ dependencies {
     compileOnly 'net.luckperms:api:5.4'
 }
 
-Map<String, String> resourceProperties = new HashMap<>();
-resourceProperties.put("version", (String) project.mod_version)
+Map<String, String> resourceProperties = new HashMap<>()
+resourceProperties.put("version", project.mod_version)
 resourceProperties.put("loader_version", project.loader_version)
 resourceProperties.put("minecraft_version", project.minecraft_version)
 
