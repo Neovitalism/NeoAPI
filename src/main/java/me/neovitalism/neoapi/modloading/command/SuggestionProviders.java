@@ -23,14 +23,13 @@ public final class SuggestionProviders {
         }
 
         @Override
-        public CompletableFuture<Suggestions> getSuggestions(CommandContext<ServerCommandSource> context,
-                                                             SuggestionsBuilder builder) {
+        public CompletableFuture<Suggestions> getSuggestions(CommandContext<ServerCommandSource> context, SuggestionsBuilder builder) {
             try {
                 String arg = context.getArgument(this.argName, String.class);
                 for (String completion : this.completions) {
                     if (StringUtil.startsWith(arg, completion)) builder.suggest(completion);
                 }
-            } catch(IllegalArgumentException e) {
+            } catch (IllegalArgumentException e) {
                 this.completions.forEach(builder::suggest);
             }
             return builder.buildFuture();
@@ -58,7 +57,7 @@ public final class SuggestionProviders {
                 for (String completion : completions) {
                     if (StringUtil.startsWith(arg, completion)) builder.suggest(completion);
                 }
-            } catch(IllegalArgumentException e) {
+            } catch (IllegalArgumentException e) {
                 completions.forEach(builder::suggest);
             }
             return builder.buildFuture();

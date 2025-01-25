@@ -10,7 +10,7 @@ public final class TimeUtil {
         try {
             long minutes = Long.parseLong(input);
             return minutes * 60;
-        } catch(NumberFormatException ignored) {}
+        } catch (NumberFormatException ignored) {}
         String charactersLeft = input.replaceAll(TimeUtil.TIME_REGEX, "");
         if (!charactersLeft.isEmpty()) return -1;
         String hourString = input.replaceAll(TimeUtil.TIME_REGEX, "$2");
@@ -20,7 +20,7 @@ public final class TimeUtil {
             long hours = (hourString.isEmpty()) ? 0 : Long.parseLong(hourString);
             long minutes = (minuteString.isEmpty()) ? (hours * 60) : Long.parseLong(minuteString) + (hours*60);
             return (secondString.isEmpty()) ? (minutes * 60) : Long.parseLong(secondString) + (minutes*60);
-        } catch(NumberFormatException e) {
+        } catch (NumberFormatException e) {
             return -1;
         }
     }
