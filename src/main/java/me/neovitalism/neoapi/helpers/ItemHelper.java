@@ -33,6 +33,10 @@ public class ItemHelper {
         return Registries.ITEM.getId(item);
     }
 
+    public static ItemStack fromConfig(Configuration config) {
+        return ItemHelper.fromConfig(config, null);
+    }
+
     public static ItemStack fromConfig(Configuration config, @Nullable Map<String, String> replacements) {
         ItemStack item = ItemHelper.createItemStack(StringUtil.replaceFromConfig(config,"material", replacements));
         ItemHelper.setDisplayName(item, StringUtil.replaceFromConfig(config, "name", replacements));
@@ -65,9 +69,9 @@ public class ItemHelper {
     }
 
     public static ItemStack createItemStack(String materialString) {
-        if (materialString == null) return null;
+        if (materialString == null) return new ItemStack(Items.STONE);
         Item material = Registries.ITEM.get(Identifier.of(materialString));
-        if (material == Items.AIR) return null;
+        if (material == Items.AIR) return new ItemStack(Items.STONE);
         return new ItemStack(material);
     }
 
@@ -139,10 +143,17 @@ public class ItemHelper {
         return customData.copyNbt().get(key);
     }
 
+    public static String getCustomString(ItemStack item, String key) {
+        NbtElement component = ItemHelper.getCustomData(item, key);
+        if (component == null) return null;
+        return component.asString();
+    }
+
     public static boolean hasCustomValue(ItemStack item, String key) {
         return ItemHelper.getCustomData(item, key) != null;
     }
 
+    @SuppressWarnings("unchecked")
     public static NbtElement getNBTElement(Object input) {
         if (input instanceof NbtCompound) return (NbtCompound) input;
         if (input instanceof Byte) return NbtByte.of((Byte) input);
@@ -153,19 +164,18 @@ public class ItemHelper {
         if (input instanceof Boolean) return NbtByte.of((Boolean) input);
         if (input instanceof String) return NbtString.of((String) input);
         if (input instanceof List<?>) {
-            if (((List<?>) input).size() == 0) return null;
-            Object listObject = ((List<?>) input).get(0);
-            if (listObject instanceof Byte) {
-                return new NbtByteArray((List<Byte>) input);
-            } else if (listObject instanceof Integer) {
-                return new NbtIntArray((List<Integer>) input);
-            } else if (listObject instanceof Long) {
-                return new NbtLongArray((List<Long>) input);
-            } else {
-                NbtList nbtList = new NbtList();
-                for (var value : ((List<?>) input)) nbtList.add(ItemHelper.getNBTElement(value));
-                return nbtList;
-            }
+            if (((List<?>) input).isEmpty()) return null;
+            Object listObject = ((List<?>) input).getFirst();
+            return switch (listObject) {
+                case Byte b -> new NbtByteArray((List<Byte>) input);
+                case Integer i -> new NbtIntArray((List<Integer>) input);
+                case Long l -> new NbtLongArray((List<Long>) input);
+                case null, default -> {
+                    NbtList nbtList = new NbtList();
+                    for (var value : ((List<?>) input)) nbtList.add(ItemHelper.getNBTElement(value));
+                    yield nbtList;
+                }
+            };
         }
         return null;
     }

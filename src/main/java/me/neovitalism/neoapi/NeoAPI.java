@@ -6,11 +6,13 @@ import me.neovitalism.neoapi.permissions.DefaultPermissionProvider;
 import me.neovitalism.neoapi.permissions.LuckPermsPermissionProvider;
 import me.neovitalism.neoapi.permissions.PermissionProvider;
 import me.neovitalism.neoapi.player.PlayerManager;
+import me.neovitalism.neoapi.utils.UUIDCache;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.kyori.adventure.platform.fabric.FabricServerAudiences;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
 
 public class NeoAPI implements ModInitializer {
     public static final NeoModLogger LOGGER = new NeoModLogger("NeoAPI");
@@ -33,8 +35,14 @@ public class NeoAPI implements ModInitializer {
             this.adventure = null;
             NeoAPIExecutorManager.shutdown();
         });
-        ServerPlayConnectionEvents.DISCONNECT.register(((handler, server) ->
-                PlayerManager.addTag(handler.getPlayer(), "neoapi.joinedBefore")));
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            ServerPlayerEntity player = handler.getPlayer();
+            if (player == null) return;
+            UUIDCache.cacheUUID(player.getName().getString(), player.getUuid());
+        });
+        ServerPlayConnectionEvents.DISCONNECT.register(((handler, server) -> {
+            PlayerManager.addTag(handler.getPlayer(), "neoapi.joinedBefore");
+        }));
     }
 
     public static MinecraftServer getServer() {

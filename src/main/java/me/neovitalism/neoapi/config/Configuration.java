@@ -1,12 +1,10 @@
 package me.neovitalism.neoapi.config;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
+import me.neovitalism.neoapi.helpers.ItemHelper;
+import me.neovitalism.neoapi.objects.Location;
+import net.minecraft.item.ItemStack;
+
+import java.util.*;
 
 public final class Configuration {
     private static final char SEPARATOR = '.';
@@ -326,5 +324,33 @@ public final class Configuration {
     public List<?> getList(String path, List<?> def) {
         List<?> val = get(path, def);
         return (val != null) ? val : def;
+    }
+
+    public Location getLocation(String path) {
+        return this.getLocation(path, null);
+    }
+
+    public Location getLocation(String path, Location def) {
+        Configuration section = this.getSection(path);
+        if (section == null) return def;
+        return new Location(section);
+    }
+
+    public ItemStack getItemStack(String path) {
+        return this.getItemStack(path, null, null);
+    }
+
+    public ItemStack getItemStack(String path, ItemStack def) {
+        return this.getItemStack(path, null, def);
+    }
+
+    public ItemStack getItemStack(String path, Map<String, String> replacements) {
+        return this.getItemStack(path, replacements, null);
+    }
+
+    public ItemStack getItemStack(String path, Map<String, String> replacements, ItemStack def) {
+        Configuration section = this.getSection(path);
+        if (section == null) return def;
+        return ItemHelper.fromConfig(section, replacements);
     }
 }

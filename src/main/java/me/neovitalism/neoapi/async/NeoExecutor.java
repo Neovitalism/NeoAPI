@@ -1,8 +1,9 @@
 package me.neovitalism.neoapi.async;
 
-import me.neovitalism.neoapi.NeoAPI;
+import me.neovitalism.neoapi.utils.ServerUtil;
 
 import java.util.concurrent.*;
+import java.util.function.Supplier;
 
 public class NeoExecutor {
     private final ScheduledExecutorService scheduler;
@@ -12,7 +13,19 @@ public class NeoExecutor {
     }
 
     public void runTaskSync(Runnable runnable) {
-        NeoAPI.getServer().executeSync(runnable);
+        ServerUtil.executeSync(runnable);
+    }
+
+    public <T> Future<T> runTaskSync(Supplier<T> supplier) {
+        return ServerUtil.executeSync(supplier);
+    }
+
+    public ScheduledFuture<?> scheduleTaskSync(Runnable runnable, long delay, TimeUnit timeUnit) {
+        return this.scheduleTaskAsync(() -> this.runTaskSync(runnable), delay, timeUnit);
+    }
+
+    public ScheduledFuture<?> scheduleRepeatingTaskSync(Runnable runnable, long initialDelay, long delay, TimeUnit timeUnit) {
+        return this.scheduleRepeatingTaskAsync(() -> this.runTaskSync(runnable), initialDelay, delay, timeUnit);
     }
 
     public <T> Future<T> runTaskAsync(Callable<T> callable) {

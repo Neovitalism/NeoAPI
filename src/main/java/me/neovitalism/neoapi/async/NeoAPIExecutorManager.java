@@ -11,8 +11,10 @@ public class NeoAPIExecutorManager {
     private static final Set<NeoExecutor> REGISTERED_EXECUTORS = new HashSet<>();
 
     public static NeoExecutor createScheduler(String nameFormat, int cores) {
-        return new NeoExecutor(Executors.newScheduledThreadPool(cores,
+        NeoExecutor executor = new NeoExecutor(Executors.newScheduledThreadPool(cores,
                 NeoAPIExecutorManager.THREAD_FACTORY_BUILDER.setNameFormat(nameFormat).build()));
+        NeoAPIExecutorManager.REGISTERED_EXECUTORS.add(executor);
+        return executor;
     }
 
     public static void shutdown() {

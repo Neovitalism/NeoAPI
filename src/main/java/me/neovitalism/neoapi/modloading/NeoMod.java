@@ -1,6 +1,5 @@
 package me.neovitalism.neoapi.modloading;
 
-import com.mojang.brigadier.CommandDispatcher;
 import me.neovitalism.neoapi.config.Configuration;
 import me.neovitalism.neoapi.config.YamlConfiguration;
 import me.neovitalism.neoapi.modloading.command.CommandRegistryInfo;
@@ -9,9 +8,6 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.command.CommandRegistryAccess;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -30,10 +26,17 @@ public abstract class NeoMod implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        ServerLifecycleEvents.SERVER_STARTED.register(server -> this.configManager());
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> this.onServerStart());
+        ServerLifecycleEvents.SERVER_STOPPING.register(server -> this.onServerStopping());
         CommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess, environment) ->
                 this.registerCommands(new CommandRegistryInfo(dispatcher, registryAccess, environment))));
     }
+
+    public void onServerStart() {
+        this.configManager();
+    }
+
+    public void onServerStopping() {}
 
     public abstract void configManager();
 

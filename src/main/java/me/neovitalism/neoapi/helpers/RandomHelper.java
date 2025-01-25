@@ -1,6 +1,5 @@
 package me.neovitalism.neoapi.helpers;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -9,8 +8,12 @@ public class RandomHelper {
     private static final Random RANDOM = new Random();
 
     public static boolean oneIn(int amount) {
-        if (amount < 1) amount = 1;
+        if (amount < 1) return false;
         return RandomHelper.RANDOM.nextInt(amount) == 0;
+    }
+
+    public static boolean chanceOutOf(int chances, int amount) {
+        return RandomHelper.oneIn(amount / chances);
     }
 
     public static int numberBetween(int min, int max) {

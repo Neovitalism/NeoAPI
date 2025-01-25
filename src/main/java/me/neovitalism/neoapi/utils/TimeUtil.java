@@ -25,6 +25,10 @@ public final class TimeUtil {
         }
     }
 
+    public static long ticksToMS(long ticks) {
+        return ticks * 50;
+    }
+
     public static String getFormattedTime(long seconds) {
         StringBuilder timeString = new StringBuilder();
         boolean usedComma = false;

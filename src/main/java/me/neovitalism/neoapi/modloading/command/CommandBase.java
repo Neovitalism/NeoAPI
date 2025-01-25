@@ -1,11 +1,12 @@
 package me.neovitalism.neoapi.modloading.command;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import me.neovitalism.neoapi.permissions.NeoPermission;
+import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
-
-import static net.minecraft.server.command.CommandManager.literal;
 
 public abstract class CommandBase {
     public CommandBase(CommandDispatcher<ServerCommandSource> dispatcher, String... aliases) {
@@ -24,5 +25,13 @@ public abstract class CommandBase {
                     for (NeoPermission permission : basePermissions) if (permission.matches(source)) return true;
                     return false;
                 }));
+    }
+
+    protected LiteralArgumentBuilder<ServerCommandSource> literal(String arg) {
+        return CommandManager.literal(arg);
+    }
+
+    protected <T> RequiredArgumentBuilder<ServerCommandSource, T> argument(String arg, ArgumentType<T> type) {
+        return CommandManager.argument(arg, type);
     }
 }

@@ -10,8 +10,6 @@ import net.minecraft.server.command.ServerCommandSource;
 
 import java.util.Locale;
 
-import static net.minecraft.server.command.CommandManager.literal;
-
 public class ReloadCommand extends CommandBase {
     private final NeoMod instance;
     protected NeoPermission reloadPermission;

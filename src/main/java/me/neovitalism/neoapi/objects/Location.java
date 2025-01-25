@@ -1,34 +1,29 @@
 package me.neovitalism.neoapi.objects;
 
-import me.neovitalism.neoapi.NeoAPI;
 import me.neovitalism.neoapi.config.Configuration;
+import me.neovitalism.neoapi.utils.LocationUtil;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.chunk.WorldChunk;
 
 import java.util.Map;
 
 public class Location {
-    private final ServerWorld world;
-    private final double x;
-    private final double y;
-    private final double z;
-    private final float pitch;
-    private final float yaw;
+    private ServerWorld world;
+    private double x;
+    private double y;
+    private double z;
+    private float pitch = -1000;
+    private float yaw = -1000;
 
     public Location(Configuration config) {
         String worldName = config.getString("world", null);
-        ServerWorld world = null;
-        if (worldName != null) {
-            for (ServerWorld serverWorld : NeoAPI.getServer().getWorlds()) {
-                if (!serverWorld.getRegistryKey().getValue().toString().equals(worldName)) continue;
-                world = serverWorld;
-                break;
-            }
-        }
-        this.world = world;
-        this.x = config.getInt("x");
-        this.y = config.getInt("y");
-        this.z = config.getInt("z");
+        if (worldName == null) this.world = null;
+        else this.world = LocationUtil.getWorld(worldName);
+        this.x = config.getDouble("x");
+        this.y = config.getDouble("y");
+        this.z = config.getDouble("z");
         this.pitch = config.getInt("pitch", -1000);
         this.yaw = config.getInt("yaw", -1000);
     }
@@ -47,8 +42,6 @@ public class Location {
         this.x = x;
         this.y = y;
         this.z = z;
-        this.pitch = -1000;
-        this.yaw = -1000;
     }
 
     public Location(ServerWorld world, double x, double y, double z, float pitch, float yaw) {
@@ -102,18 +95,80 @@ public class Location {
         return this.yaw;
     }
 
+    public BlockPos getBlockPos() {
+        return new BlockPos((int) Math.round(this.x), (int) Math.round(this.y), (int) Math.round(this.z));
+    }
+
+    public WorldChunk getChunk() {
+        return this.world.getWorldChunk(this.getBlockPos());
+    }
+
+    public void setWorld(ServerWorld world) {
+        this.world = world;
+    }
+
+    public void setX(double x) {
+        this.x = x;
+    }
+
+    public void setY(double y) {
+        this.y = y;
+    }
+
+    public void setZ(double z) {
+        this.z = z;
+    }
+
+    public void setPitch(float pitch) {
+        this.pitch = pitch;
+    }
+
+    public void setYaw(float yaw) {
+        this.yaw = yaw;
+    }
+
+    public void shift(double x, double y, double z) {
+        this.shift(x, y, z, 0, 0);
+    }
+
+    public void shift(double x, double y, double z, float pitch, float yaw) {
+        this.x += x;
+        this.y += y;
+        this.z += z;
+        this.pitch += pitch;
+        this.yaw += yaw;
+    }
+
+    public Location withWorld(ServerWorld world) {
+        this.world = world;
+        return this;
+    }
+
+    public Location shifted(double x, double y, double z) {
+        return this.shifted(x, y, z, 0, 0);
+    }
+
+    public Location shifted(double x, double y, double z, float pitch, float yaw) {
+        this.shift(x, y, z, pitch, yaw);
+        return this;
+    }
+
+    public Location copy() {
+        return new Location(this.world, this.x, this.y, this.z, this.pitch, this.yaw);
+    }
+
     public void addReplacements(Map<String, String> replacements) {
         replacements.put("{x}", String.valueOf(this.x));
         replacements.put("{y}", String.valueOf(this.y));
         replacements.put("{z}", String.valueOf(this.z));
         replacements.put("{pitch}", String.valueOf(this.pitch));
         replacements.put("{yaw}", String.valueOf(this.yaw));
-        replacements.put("{world}", this.world.getRegistryKey().getValue().toString());
+        if (this.world != null) replacements.put("{world}", this.world.getRegistryKey().getValue().toString());
     }
 
     public Configuration toConfiguration() {
         Configuration locationConfig = new Configuration();
-        locationConfig.set("world", this.world.getRegistryKey().getValue().toString());
+        if (this.world != null) locationConfig.set("world", this.world.getRegistryKey().getValue().toString());
         locationConfig.set("x", this.x);
         locationConfig.set("y", this.y);
         locationConfig.set("z", this.z);
