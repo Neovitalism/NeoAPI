@@ -15,7 +15,7 @@ import java.util.UUID;
 
 public class UUIDCache {
     private static final String NAME_TO_UUID_URL = "https://api.mojang.com/users/profiles/minecraft/";
-    private static final String UUID_TO_NAME_URL = "https://https://api.minecraftservices.com/minecraft/profile/lookup/";
+    private static final String UUID_TO_NAME_URL = "https://api.minecraftservices.com/minecraft/profile/lookup/";
 
     private static final BiMap<String, UUID> PLAYER_UUID_CACHE = HashBiMap.create();
 
