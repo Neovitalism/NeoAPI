@@ -16,7 +16,7 @@ public class NeoExecutor {
         ServerUtil.executeSync(runnable);
     }
 
-    public <T> Future<T> runTaskSync(Supplier<T> supplier) {
+    public <T> CompletableFuture<T> runTaskSync(Supplier<T> supplier) {
         return ServerUtil.executeSync(supplier);
     }
 
@@ -28,8 +28,13 @@ public class NeoExecutor {
         return this.scheduleRepeatingTaskAsync(() -> this.runTaskSync(runnable), initialDelay, delay, timeUnit);
     }
 
+    @Deprecated
     public <T> Future<T> runTaskAsync(Callable<T> callable) {
         return this.scheduler.submit(callable);
+    }
+
+    public <T> CompletableFuture<T> runCompletableTaskAsync(Supplier<T> supplier) {
+        return CompletableFuture.supplyAsync(supplier, this.scheduler);
     }
 
     public void runTaskAsync(Runnable runnable) {

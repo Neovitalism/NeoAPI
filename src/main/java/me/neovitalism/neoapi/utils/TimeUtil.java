@@ -75,6 +75,11 @@ public final class TimeUtil {
         return timeString.toString();
     }
 
+    public static String executedTimeToFormatted(long executedTime) {
+        long between = System.currentTimeMillis() - executedTime;
+        return TimeUtil.getFormattedTime(TimeUnit.MILLISECONDS.toSeconds(between));
+    }
+
     public static void addReplacements(long seconds, Map<String, String> replacements) {
         long days = TimeUnit.SECONDS.toDays(seconds);
         long hoursNoDays = TimeUnit.SECONDS.toHours(seconds);

@@ -11,9 +11,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class LangManager {
+    private final boolean capitalized;
     private final Map<String, String> lang = new HashMap<>();
 
     public LangManager(Configuration langConfig) {
+        this.capitalized = true;
+        if (langConfig == null) return;
+        for (String key : langConfig.getKeys()) this.lang.put(key, langConfig.getString(key));
+    }
+
+    public LangManager(Configuration langConfig, boolean capitalized) {
+        this.capitalized = capitalized;
         if (langConfig == null) return;
         for (String key : langConfig.getKeys()) this.lang.put(key, langConfig.getString(key));
     }
@@ -28,9 +36,9 @@ public final class LangManager {
 
     public void sendLang(Audience audience, String key, @Nullable Map<String, String> replacements) {
         String lang = this.getLang(key);
-        if (lang == null) return;
+        if (lang == null || lang.isEmpty()) return;
         lang = StringUtil.replaceReplacements(lang, replacements);
-        String prefix = this.getLang("Prefix");
+        String prefix = this.getLang((this.capitalized) ? "Prefix" : "prefix");
         if (prefix != null) lang = prefix + lang;
         audience.sendMessage(ColorUtil.parseColour(lang));
     }

@@ -16,6 +16,10 @@ public class RandomHelper {
         return RandomHelper.oneIn(amount / chances);
     }
 
+    public static boolean percentChance(double percent) {
+        return (RandomHelper.RANDOM.nextDouble() * 100) <= percent;
+    }
+
     public static int numberBetween(int min, int max) {
         return RandomHelper.RANDOM.nextInt(max - min + 1) + min;
     }
@@ -35,5 +39,4 @@ public class RandomHelper {
         }
         return null;
     }
-
 }

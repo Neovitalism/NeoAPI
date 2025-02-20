@@ -29,6 +29,10 @@
     "java": ">=21"
   },
 
+  "mixins": [
+    "neoapi.mixins.json"
+  ],
+
   "suggests": {
     "luckperms": ">=5.4.139"
   }

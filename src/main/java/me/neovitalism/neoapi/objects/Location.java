@@ -2,9 +2,11 @@ package me.neovitalism.neoapi.objects;
 
 import me.neovitalism.neoapi.config.Configuration;
 import me.neovitalism.neoapi.utils.LocationUtil;
+import net.minecraft.block.BlockState;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.WorldChunk;
 
 import java.util.Map;
@@ -99,8 +101,17 @@ public class Location {
         return new BlockPos((int) Math.round(this.x), (int) Math.round(this.y), (int) Math.round(this.z));
     }
 
+    public Biome getBiome() {
+        return this.world.getBiome(this.getBlockPos()).value();
+    }
+
     public WorldChunk getChunk() {
         return this.world.getWorldChunk(this.getBlockPos());
+    }
+
+    public BlockState getBlockState() {
+        if (this.world == null) return null;
+        return world.getBlockState(this.getBlockPos());
     }
 
     public void setWorld(ServerWorld world) {
@@ -141,6 +152,21 @@ public class Location {
 
     public Location withWorld(ServerWorld world) {
         this.world = world;
+        return this;
+    }
+
+    public Location withX(double x) {
+        this.x = x;
+        return this;
+    }
+
+    public Location withY(double y) {
+        this.y = y;
+        return this;
+    }
+
+    public Location withZ(double z) {
+        this.z = z;
         return this;
     }
 
