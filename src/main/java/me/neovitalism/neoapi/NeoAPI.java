@@ -1,25 +1,37 @@
 package me.neovitalism.neoapi;
 
 import me.neovitalism.neoapi.async.NeoAPIExecutorManager;
-import me.neovitalism.neoapi.modloading.logging.NeoModLogger;
+import me.neovitalism.neoapi.async.NeoExecutor;
+import me.neovitalism.neoapi.modloading.NeoMod;
 import me.neovitalism.neoapi.permissions.DefaultPermissionProvider;
 import me.neovitalism.neoapi.permissions.LuckPermsPermissionProvider;
 import me.neovitalism.neoapi.permissions.PermissionProvider;
 import me.neovitalism.neoapi.player.PlayerManager;
 import me.neovitalism.neoapi.utils.UUIDCache;
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.kyori.adventure.platform.fabric.FabricServerAudiences;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
 
-public class NeoAPI implements ModInitializer {
-    public static final NeoModLogger LOGGER = new NeoModLogger("NeoAPI");
+import java.util.concurrent.Future;
+
+public class NeoAPI extends NeoMod {
+    private static final NeoExecutor SCHEDULER = NeoAPIExecutorManager.createScheduler("NeoAPI-Thread", 1);
+
     private static NeoAPI instance = null;
     private MinecraftServer server = null;
     private PermissionProvider permissionProvider = null;
     private FabricServerAudiences adventure = null;
+
+    @Override
+    public String getModID() {
+        return "NeoAPI";
+    }
+
+    @Override
+    public String getModPrefix() {
+        return "";
+    }
 
     @Override
     public void onInitialize() {
@@ -35,14 +47,14 @@ public class NeoAPI implements ModInitializer {
             this.adventure = null;
             NeoAPIExecutorManager.shutdown();
         });
-        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-            ServerPlayerEntity player = handler.getPlayer();
-            if (player == null) return;
-            UUIDCache.cacheUUID(player.getName().getString(), player.getUuid());
-        });
+        UUIDCache.startup();
         ServerPlayConnectionEvents.DISCONNECT.register(((handler, server) -> {
             PlayerManager.addTag(handler.getPlayer(), "neoapi.joinedBefore");
         }));
+    }
+
+    public static NeoAPI inst() {
+        return NeoAPI.instance;
     }
 
     public static MinecraftServer getServer() {
@@ -61,10 +73,14 @@ public class NeoAPI implements ModInitializer {
         try {
             Class.forName("net.luckperms.api.LuckPerms");
             this.permissionProvider = new LuckPermsPermissionProvider();
-            NeoAPI.LOGGER.info("Found LuckPerms! Permission support enabled.");
+            this.getLogger().info("Found LuckPerms! Permission support enabled.");
             return;
         } catch (ClassNotFoundException ignored) {}
         this.permissionProvider = new DefaultPermissionProvider();
-        NeoAPI.LOGGER.warn("Couldn't find LuckPerms.. falling back to permission levels.");
+        this.getLogger().warn("Couldn't find LuckPerms.. falling back to permission levels.");
+    }
+
+    public Future<?> runTaskAsync(Runnable runnable) {
+        return NeoAPI.SCHEDULER.runTaskAsync(runnable);
     }
 }

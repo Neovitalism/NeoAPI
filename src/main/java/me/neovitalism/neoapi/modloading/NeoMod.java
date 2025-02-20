@@ -38,9 +38,9 @@ public abstract class NeoMod implements ModInitializer {
 
     public void onServerStopping() {}
 
-    public abstract void configManager();
+    public void configManager() {}
 
-    public abstract void registerCommands(CommandRegistryInfo info);
+    public void registerCommands(CommandRegistryInfo info) {}
 
     public NeoModLogger getLogger() {
         return this.logger;

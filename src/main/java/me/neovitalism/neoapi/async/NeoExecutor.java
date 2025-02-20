@@ -37,8 +37,8 @@ public class NeoExecutor {
         return CompletableFuture.supplyAsync(supplier, this.scheduler);
     }
 
-    public void runTaskAsync(Runnable runnable) {
-        this.scheduler.submit(runnable);
+    public Future<?> runTaskAsync(Runnable runnable) {
+        return this.scheduler.submit(runnable);
     }
 
     public <T> ScheduledFuture<T> scheduleTaskAsync(Callable<T> callable, long delay, TimeUnit timeUnit) {
