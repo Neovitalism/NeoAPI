@@ -16,6 +16,14 @@ public class NeoExecutor {
         ServerUtil.executeSync(runnable);
     }
 
+    public void runSafely(Runnable runnable) {
+        try {
+            runnable.run();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public <T> CompletableFuture<T> runTaskSync(Supplier<T> supplier) {
         return ServerUtil.executeSync(supplier);
     }

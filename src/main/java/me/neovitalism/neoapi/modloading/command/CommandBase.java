@@ -9,7 +9,14 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 
 public abstract class CommandBase {
+    protected NeoPermission storedPermission;
+
     public CommandBase(CommandDispatcher<ServerCommandSource> dispatcher, String... aliases) {
+        for (String alias : aliases) dispatcher.register(this.getCommand(alias));
+    }
+
+    protected CommandBase(CommandDispatcher<ServerCommandSource> dispatcher, NeoPermission storedPermission, String... aliases) {
+        this.storedPermission = storedPermission;
         for (String alias : aliases) dispatcher.register(this.getCommand(alias));
     }
 

@@ -4,7 +4,7 @@
   "package": "me.neovitalism.neoapi.mixins",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "EntityMixin"
+
   ],
   "injectors": {
     "defaultRequire": 1

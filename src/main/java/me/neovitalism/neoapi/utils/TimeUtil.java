@@ -80,6 +80,11 @@ public final class TimeUtil {
         return TimeUtil.getFormattedTime(TimeUnit.MILLISECONDS.toSeconds(between));
     }
 
+    public static String executeTimeToFormatted(long executeTime) {
+        long between = executeTime - System.currentTimeMillis();
+        return TimeUtil.getFormattedTime(TimeUnit.MILLISECONDS.toSeconds(between));
+    }
+
     public static void addReplacements(long seconds, Map<String, String> replacements) {
         long days = TimeUnit.SECONDS.toDays(seconds);
         long hoursNoDays = TimeUnit.SECONDS.toHours(seconds);

@@ -12,7 +12,9 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.biome.Biome;
 
 import java.util.ArrayList;
@@ -38,14 +40,22 @@ public final class LocationUtil {
     }
 
     public static Location getHighestBlock(Location location) {
-        int highestY = location.getWorld().getTopY();
-        int bottomY = location.getWorld().getBottomY();
         Location copy = location.copy();
-        for (int y = highestY; y > bottomY; y--) {
-            copy.withY(y);
-            if (!BlockUtil.isAir(copy.getBlockState())) return copy;
+        for (int y = location.getWorld().getTopY(); y > location.getWorld().getBottomY(); y--) {
+            if (!BlockUtil.isAir(copy.withY(y).getBlockState())) break;
         }
         return null;
+    }
+
+    public static boolean canSeeSky(ServerPlayerEntity player) {
+        Location playerLoc = new Location(player).centered();
+        return player.getWorld().raycast(new RaycastContext(
+                new Vec3d(playerLoc.getX(), playerLoc.getY() + 1, playerLoc.getZ()),
+                new Vec3d(playerLoc.getX(), player.getWorld().getTopY(), playerLoc.getZ()),
+                RaycastContext.ShapeType.COLLIDER,
+                RaycastContext.FluidHandling.NONE,
+                player
+        )).getType() == HitResult.Type.MISS;
     }
 
     public static Registry<Biome> getBiomeRegistry() {
@@ -80,6 +90,12 @@ public final class LocationUtil {
     }
 
     public static String biomeToTranslatable(Identifier biomeID) {
-        return "<lang:biome." + biomeID.getPath() +">";
+        return "<lang:biome." + biomeID.toString().replace(":", ".") +">";
+    }
+
+    public static int distance(int x, int z) {
+        int max = Math.max(x, z);
+        int min = Math.min(x, z);
+        return max - min;
     }
 }

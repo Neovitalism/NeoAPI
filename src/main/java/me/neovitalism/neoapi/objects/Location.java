@@ -6,6 +6,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.WorldChunk;
 
@@ -101,6 +103,10 @@ public class Location {
         return new BlockPos((int) Math.round(this.x), (int) Math.round(this.y), (int) Math.round(this.z));
     }
 
+    public Vec3d toVec3d() {
+        return new Vec3d(this.x, this.y, this.z);
+    }
+
     public Biome getBiome() {
         return this.world.getBiome(this.getBlockPos()).value();
     }
@@ -179,6 +185,18 @@ public class Location {
         return this;
     }
 
+    public Location centered() {
+        this.x = ((int) this.x) + 0.5;
+        this.y = (int) this.y;
+        this.z = ((int) this.z) + 0.5;
+        return this;
+    }
+
+    public boolean isLoaded() {
+        ChunkPos chunkPos = this.getChunk().getPos();
+        return this.getWorld().isChunkLoaded(chunkPos.x, chunkPos.z);
+    }
+
     public Location copy() {
         return new Location(this.world, this.x, this.y, this.z, this.pitch, this.yaw);
     }
@@ -189,6 +207,15 @@ public class Location {
         replacements.put("{z}", String.valueOf(this.z));
         replacements.put("{pitch}", String.valueOf(this.pitch));
         replacements.put("{yaw}", String.valueOf(this.yaw));
+        if (this.world != null) replacements.put("{world}", this.world.getRegistryKey().getValue().toString());
+    }
+
+    public void addReplacements(Map<String, String> replacements, String format) {
+        replacements.put("{x}", String.format(format, this.x));
+        replacements.put("{y}", String.format(format, this.y));
+        replacements.put("{z}", String.format(format, this.z));
+        replacements.put("{pitch}", String.format(format, this.pitch));
+        replacements.put("{yaw}", String.format(format, this.yaw));
         if (this.world != null) replacements.put("{world}", this.world.getRegistryKey().getValue().toString());
     }
 
