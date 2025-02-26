@@ -229,4 +229,8 @@ public class Location {
         locationConfig.set("yaw", this.yaw);
         return locationConfig;
     }
+
+    public static Location from(ServerWorld world, BlockPos pos) {
+        return new Location(world, pos.getX(), pos.getY(), pos.getZ());
+    }
 }

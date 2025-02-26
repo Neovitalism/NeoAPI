@@ -36,6 +36,7 @@ public final class SuggestionProviders {
         }
     }
 
+    @Deprecated
     public static final class Player implements SuggestionProvider<ServerCommandSource> {
         private final boolean canTargetAll;
 

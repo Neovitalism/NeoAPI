@@ -41,18 +41,12 @@ public class ItemHelper {
         ItemStack item = ItemHelper.createItemStack(StringUtil.replaceFromConfig(config,"material", replacements));
         ItemHelper.setDisplayName(item, StringUtil.replaceFromConfig(config, "name", replacements));
         List<String> lore = config.getStringList("lore");
-        lore.replaceAll(input -> StringUtil.replaceReplacements(input, replacements));
-        ItemHelper.setLore(item, lore);
+        ItemHelper.setLore(item, lore.stream().map(line -> StringUtil.replaceReplacements(line, replacements)).toList());
         item.setCount(config.getInt("amount", 1));
         Configuration enchantSection = config.getSection("enchants");
-        for (String key : enchantSection.getKeys()) {
-            int level = enchantSection.getInt(key);
-            ItemHelper.addEnchantment(item, key, level);
-        }
-        if (config.contains("custom-model-data"))
-            ItemHelper.setCustomModelData(item, config.getInt("custom-model-data"));
-        if (config.contains("max-stack-size"))
-            ItemHelper.setMaxStackSize(item, config.getInt("max-stack-size"));
+        for (String key : enchantSection.getKeys()) ItemHelper.addEnchantment(item, key, enchantSection.getInt(key));
+        if (config.contains("custom-model-data")) ItemHelper.setCustomModelData(item, config.getInt("custom-model-data"));
+        if (config.contains("max-stack-size")) ItemHelper.setMaxStackSize(item, config.getInt("max-stack-size"));
         ItemHelper.hideTooltip(item, config.getBoolean("hide-tooltip"));
         ItemHelper.hideAdditionalTooltip(item, config.getBoolean("hide-additional-tooltip"));
         ItemHelper.setUnbreakable(item, config.getBoolean("unbreakable"));
@@ -80,9 +74,14 @@ public class ItemHelper {
     }
 
     public static void setLore(ItemStack item, List<String> lore) {
-        List<Text> loreText = new ArrayList<>();
-        if (lore != null) for (String line : lore) loreText.add(ColorUtil.parseColourToText(line));
-        item.set(DataComponentTypes.LORE, (!loreText.isEmpty()) ? new LoreComponent(loreText) : null);
+        if (lore == null) lore = new ArrayList<>();
+        lore.removeIf(String::isEmpty);
+        if (lore.isEmpty()) {
+            item.set(DataComponentTypes.LORE, null);
+            return;
+        }
+        List<Text> loreText = lore.stream().map(ColorUtil::parseColourToText).toList();
+        item.set(DataComponentTypes.LORE, new LoreComponent(loreText, loreText));
     }
 
     public static Enchantment getEnchant(String enchantID) {

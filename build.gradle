@@ -60,3 +60,5 @@ publishing {
         }
     }
 }
+
+tasks.build.finalizedBy(publishToMavenLocal)

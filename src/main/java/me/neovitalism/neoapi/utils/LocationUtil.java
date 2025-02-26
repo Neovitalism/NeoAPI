@@ -2,17 +2,15 @@ package me.neovitalism.neoapi.utils;
 
 import me.neovitalism.neoapi.NeoAPI;
 import me.neovitalism.neoapi.objects.Location;
-import net.minecraft.block.Blocks;
-import net.minecraft.item.Items;
-import net.minecraft.registry.Registries;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.biome.Biome;
@@ -40,23 +38,27 @@ public final class LocationUtil {
     }
 
     public static Location getHighestBlock(Location location) {
-        Location copy = location.copy();
-        for (int y = location.getWorld().getTopY(); y > location.getWorld().getBottomY(); y--) {
-            if (!BlockUtil.isAir(copy.withY(y).getBlockState())) break;
-        }
-        return null;
-    }
-
-    public static boolean canSeeSky(ServerPlayerEntity player) {
-        Location playerLoc = new Location(player).centered();
-        return player.getWorld().raycast(new RaycastContext(
-                new Vec3d(playerLoc.getX(), playerLoc.getY() + 1, playerLoc.getZ()),
-                new Vec3d(playerLoc.getX(), player.getWorld().getTopY(), playerLoc.getZ()),
+        Location copy = location.copy().centered();
+        BlockHitResult result = copy.getWorld().raycast(new RaycastContext(
+                new Vec3d(copy.getX(), copy.getWorld().getTopY(), copy.getZ()),
+                new Vec3d(copy.getX(), copy.getWorld().getBottomY(), copy.getZ()),
                 RaycastContext.ShapeType.COLLIDER,
                 RaycastContext.FluidHandling.NONE,
-                player
-        )).getType() == HitResult.Type.MISS;
+                ShapeContext.absent()
+        ));
+        return result.getType() == HitResult.Type.MISS ? null : Location.from(copy.getWorld(), result.getBlockPos());
     }
+
+//    public static boolean canSeeSky(ServerPlayerEntity player) { // ToDo: this & ignore leaves
+//        Location playerLoc = new Location(player).centered();
+//        return player.getWorld().raycast(new RaycastContext(
+//                new Vec3d(playerLoc.getX(), playerLoc.getY() + 1, playerLoc.getZ()),
+//                new Vec3d(playerLoc.getX(), player.getWorld().getTopY(), playerLoc.getZ()),
+//                RaycastContext.ShapeType.COLLIDER,
+//                RaycastContext.FluidHandling.NONE,
+//                player
+//        )).getType() == HitResult.Type.MISS;
+//    }
 
     public static Registry<Biome> getBiomeRegistry() {
         return NeoAPI.getServer().getRegistryManager().get(RegistryKeys.BIOME);
