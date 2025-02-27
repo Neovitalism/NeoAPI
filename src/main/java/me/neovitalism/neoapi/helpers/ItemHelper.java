@@ -24,7 +24,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Unit;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -74,9 +73,7 @@ public class ItemHelper {
     }
 
     public static void setLore(ItemStack item, List<String> lore) {
-        if (lore == null) lore = new ArrayList<>();
-        lore.removeIf(String::isEmpty);
-        if (lore.isEmpty()) {
+        if (lore == null || lore.stream().allMatch(String::isBlank)) {
             item.set(DataComponentTypes.LORE, null);
             return;
         }
