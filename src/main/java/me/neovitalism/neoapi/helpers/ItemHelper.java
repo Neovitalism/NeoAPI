@@ -78,7 +78,7 @@ public class ItemHelper {
             return;
         }
         List<Text> loreText = lore.stream().map(ColorUtil::parseColourToText).toList();
-        item.set(DataComponentTypes.LORE, new LoreComponent(loreText, loreText));
+        item.set(DataComponentTypes.LORE, new LoreComponent(loreText));
     }
 
     public static Enchantment getEnchant(String enchantID) {

@@ -36,7 +36,7 @@ public final class LangManager {
 
     public void sendLang(Audience audience, String key, @Nullable Map<String, String> replacements) {
         String lang = this.getLang(key);
-        if (lang == null || lang.isEmpty()) return;
+        if (lang == null || lang.isBlank()) return;
         lang = StringUtil.replaceReplacements(lang, replacements);
         String prefix = this.getLang((this.capitalized) ? "Prefix" : "prefix");
         if (prefix != null) lang = prefix + lang;

@@ -2,6 +2,7 @@ package me.neovitalism.neoapi.utils;
 
 import me.neovitalism.neoapi.NeoAPI;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.minecraft.text.Text;
@@ -35,7 +36,8 @@ public final class ColorUtil {
     }
 
     public static Text parseColourToText(String input) {
-        return ColorUtil.toText(ColorUtil.parseColour(input));
+        Component component = ColorUtil.parseColour(input).decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE);
+        return ColorUtil.toText(component);
     }
 
     private static String replaceCodes(String input) {
