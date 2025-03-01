@@ -5,7 +5,7 @@ import net.minecraft.block.Blocks;
 
 public class BlockUtil {
     public static boolean isWater(BlockState state) {
-        return state.equals(Blocks.WATER.getDefaultState());
+        return state.isOf(Blocks.WATER);
     }
 
     public static boolean isAir(BlockState state) {

@@ -43,7 +43,7 @@ public final class LocationUtil {
                 new Vec3d(copy.getX(), copy.getWorld().getTopY(), copy.getZ()),
                 new Vec3d(copy.getX(), copy.getWorld().getBottomY(), copy.getZ()),
                 RaycastContext.ShapeType.COLLIDER,
-                RaycastContext.FluidHandling.NONE,
+                RaycastContext.FluidHandling.SOURCE_ONLY,
                 ShapeContext.absent()
         ));
         return result.getType() == HitResult.Type.MISS ? null : Location.from(copy.getWorld(), result.getBlockPos());
