@@ -1,6 +1,7 @@
 package me.neovitalism.neoapi.config;
 
 import me.neovitalism.neoapi.helpers.ItemHelper;
+import me.neovitalism.neoapi.lang.LangManager;
 import me.neovitalism.neoapi.objects.Location;
 import net.minecraft.item.ItemStack;
 
@@ -9,7 +10,7 @@ import java.util.*;
 public final class Configuration {
     private static final char SEPARATOR = '.';
     final Map<String, Object> self;
-    private final Configuration defaults;
+    private Configuration defaults;
 
     public Configuration() {
         this(null);
@@ -32,6 +33,10 @@ public final class Configuration {
                 this.self.put(key, entry.getValue());
             }
         }
+    }
+
+    public void setDefaults(Configuration def) {
+        this.defaults = def;
     }
 
     private Configuration getSectionFor(String path) {
@@ -352,5 +357,13 @@ public final class Configuration {
         Configuration section = this.getSection(path);
         if (section == null) return def;
         return ItemHelper.fromConfig(section, replacements);
+    }
+
+    public LangManager getLangManager(String path) {
+        return new LangManager(this.getSection(path));
+    }
+
+    public LangManager getLangManager(String path, boolean capitalized) {
+        return new LangManager(this.getSection(path), capitalized);
     }
 }
