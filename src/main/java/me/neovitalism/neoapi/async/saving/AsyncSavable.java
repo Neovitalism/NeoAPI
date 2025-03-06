@@ -3,10 +3,15 @@ package me.neovitalism.neoapi.async.saving;
 import me.neovitalism.neoapi.async.NeoExecutor;
 import me.neovitalism.neoapi.config.Configuration;
 import me.neovitalism.neoapi.modloading.NeoMod;
+import me.neovitalism.neoapi.storage.AbstractStorage;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+@Deprecated(since = "2.2.0")
+/**
+ * Use {@link AbstractStorage} instead for storage needs.
+ */
 public abstract class AsyncSavable {
     private final NeoMod instance;
     private final NeoExecutor executor;
