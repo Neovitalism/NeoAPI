@@ -5,6 +5,7 @@ import me.neovitalism.neoapi.config.Configuration;
 import me.neovitalism.neoapi.modloading.NeoMod;
 
 import java.io.File;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -32,15 +33,16 @@ public abstract class AbstractStorage {
                     this.storageType = StorageType.YAML;
                 } else {
                     this.storageType = StorageType.MARIADB;
-                    this.databaseConnection.createTable(this.getTableName(), this.getTableArguments());
+                    for (Map.Entry<String, String> table : this.getTables().entrySet()) {
+                        this.databaseConnection.createTable(table.getKey(), table.getValue());
+                    }
                 }
             } else this.storageType = storageType;
         } else this.storageType = StorageType.YAML;
     }
 
     public abstract String getFileName();
-    public abstract String getTableName();
-    public abstract String getTableArguments();
+    public abstract Map<String, String> getTables();
 
     public void load() {
         Configuration config = this.instance.getConfig(this.getFileName(), false);
