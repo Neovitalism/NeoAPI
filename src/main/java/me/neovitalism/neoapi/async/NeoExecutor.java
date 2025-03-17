@@ -62,6 +62,6 @@ public class NeoExecutor {
     }
 
     public void shutdown() {
-        this.scheduler.shutdownNow();
+        this.scheduler.shutdown();
     }
 }
