@@ -1,8 +1,8 @@
 package me.neovitalism.neoapi.helpers;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.*;
 
 public class RandomHelper {
     private static final Random RANDOM = new Random();
@@ -10,6 +10,10 @@ public class RandomHelper {
     public static boolean oneIn(int amount) {
         if (amount < 1) return false;
         return RandomHelper.RANDOM.nextInt(amount) == 0;
+    }
+
+    public static boolean oneIn(double amount) {
+        return (amount >= 1) ? (RandomHelper.RANDOM.nextDouble() < 1 / amount) : (RandomHelper.RANDOM.nextDouble() < amount);
     }
 
     public static boolean chanceOutOf(int chances, int amount) {
@@ -27,6 +31,24 @@ public class RandomHelper {
     public static <T> T getRandomValue(List<T> list) {
         if (list.isEmpty()) return null;
         return list.get(RandomHelper.RANDOM.nextInt(list.size()));
+    }
+
+    public static <T> Set<T> getUniqueValues(Collection<T> originals, @Nullable Collection<T> alreadyUsed, int amount) {
+        Set<T> toReturn = new HashSet<>();
+        List<T> copy = new ArrayList<>(originals);
+        if (alreadyUsed != null) copy.removeAll(alreadyUsed);
+        if (copy.isEmpty()) return toReturn;
+        if (copy.size() <= amount) {
+            toReturn.addAll(copy);
+            return toReturn;
+        }
+        for (int i = 0; i < amount; i++) {
+            if (copy.isEmpty()) break;
+            T value = RandomHelper.getRandomValue(copy);
+            copy.remove(value);
+            toReturn.add(value);
+        }
+        return toReturn;
     }
 
     public static <T> T getWeightedResult(Map<T, Double> weightedObjects) {

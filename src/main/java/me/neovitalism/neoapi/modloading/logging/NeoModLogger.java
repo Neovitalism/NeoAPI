@@ -23,4 +23,9 @@ public class NeoModLogger {
     public void error(String s) {
         this.logger.error("{}{}", this.id, s);
     }
+
+    public void printStackTrace(Throwable throwable) {
+        this.error(throwable.toString());
+        for (StackTraceElement traceElement : throwable.getStackTrace()) this.error("\tat " + traceElement);
+    }
 }

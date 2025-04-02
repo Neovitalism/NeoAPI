@@ -8,10 +8,10 @@ import me.neovitalism.neoapi.storage.AbstractStorage;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-@Deprecated(since = "2.2.0")
 /**
  * Use {@link AbstractStorage} instead for storage needs.
  */
+@Deprecated(since = "2.2.0")
 public abstract class AsyncSavable {
     private final NeoMod instance;
     private final NeoExecutor executor;

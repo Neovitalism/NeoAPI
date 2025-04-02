@@ -72,7 +72,7 @@ public abstract class NeoMod implements ModInitializer {
             return YamlConfiguration.loadConfiguration(configFile); // ?
         } catch (IOException e) {
             this.logger.error("Something went wrong getting the config: " + configFile.getName() + ".");
-            e.printStackTrace();
+            this.logger.printStackTrace(e);
         }
         return null;
     }
@@ -83,7 +83,7 @@ public abstract class NeoMod implements ModInitializer {
             YamlConfiguration.save(config, file);
         } catch (IOException e) {
             this.logger.error("Something went wrong saving the config: " + fileName + ".");
-            e.printStackTrace();
+            this.logger.printStackTrace(e);
         }
     }
 
@@ -99,7 +99,7 @@ public abstract class NeoMod implements ModInitializer {
             in.transferTo(outputStream);
         } catch (IOException e) {
             this.logger.error("Something went wrong saving the resource: " + fileName + ".");
-            e.printStackTrace();
+            this.logger.printStackTrace(e);
         }
     }
 }
