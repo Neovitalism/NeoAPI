@@ -24,6 +24,18 @@ public final  class StringUtil {
         return input;
     }
 
+    public static String replaceRegex(String input, @Nullable Map<String, String> replacements) {
+        if (input == null) return null;
+        if (replacements != null) {
+            for (Map.Entry<String, String> replacer : replacements.entrySet()) {
+                input = input.replaceAll(replacer.getKey(), replacer.getValue());
+            }
+        }
+        input = n(input);
+        input = s(input);
+        return input;
+    }
+
     public static String replaceFromConfig(Configuration config, String key, @Nullable Map<String, String> replacements) {
         return StringUtil.replaceReplacements(config.getString(key), replacements);
     }

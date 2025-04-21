@@ -18,6 +18,19 @@ public final class ColorUtil {
     public static Component parseColour(String input) {
         return MiniMessage.miniMessage().deserialize(ColorUtil.replaceCodes(input));
     }
+
+    public static Text parseColourToText(String input) {
+        Component component = ColorUtil.parseColour(input).decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE);
+        return ColorUtil.toText(component);
+    }
+
+    public static String serialize(Component component) {
+        return MiniMessage.miniMessage().serialize(component).replaceFirst("<!italic>", "");
+    }
+
+    public static String serialize(Text text) {
+        return ColorUtil.serialize(text.asComponent());
+    }
     
     public static Text toText(Component component) {
         return ColorUtil.fromJson(ColorUtil.toJson(component));
@@ -33,11 +46,6 @@ public final class ColorUtil {
 
     public static String toJson(Component component) {
         return GsonComponentSerializer.gson().serialize(component);
-    }
-
-    public static Text parseColourToText(String input) {
-        Component component = ColorUtil.parseColour(input).decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE);
-        return ColorUtil.toText(component);
     }
 
     private static String replaceCodes(String input) {

@@ -24,6 +24,8 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Unit;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,9 +40,18 @@ public class ItemHelper {
 
     public static ItemStack fromConfig(Configuration config, @Nullable Map<String, String> replacements) {
         ItemStack item = ItemHelper.createItemStack(StringUtil.replaceFromConfig(config,"material", replacements));
+        if (item.isOf(Items.AIR)) return item;
         ItemHelper.setDisplayName(item, StringUtil.replaceFromConfig(config, "name", replacements));
         List<String> lore = config.getStringList("lore");
-        ItemHelper.setLore(item, lore.stream().map(line -> StringUtil.replaceReplacements(line, replacements)).toList());
+        Configuration loreReplacementSection = config.getSection("lore-replacements");
+        Map<String, String> loreReplacements = null;
+        if (loreReplacementSection != null) {
+            loreReplacements = new HashMap<>();
+            for (String key : loreReplacementSection.getKeys()) {
+                loreReplacements.put(key, loreReplacementSection.getString(key));
+            }
+        }
+        ItemHelper.setLore(item, lore.stream().map(line -> StringUtil.replaceReplacements(line, replacements)).toList(), loreReplacements);
         item.setCount(config.getInt("amount", 1));
         Configuration enchantSection = config.getSection("enchants");
         for (String key : enchantSection.getKeys()) ItemHelper.addEnchantment(item, key, enchantSection.getInt(key));
@@ -64,7 +75,6 @@ public class ItemHelper {
     public static ItemStack createItemStack(String materialString) {
         if (materialString == null) return new ItemStack(Items.STONE);
         Item material = Registries.ITEM.get(Identifier.of(materialString));
-        if (material == Items.AIR) return new ItemStack(Items.STONE);
         return new ItemStack(material);
     }
 
@@ -73,12 +83,26 @@ public class ItemHelper {
     }
 
     public static void setLore(ItemStack item, List<String> lore) {
-        if (lore == null || lore.stream().allMatch(String::isBlank)) {
+        if (lore == null || lore.isEmpty()) {
             item.set(DataComponentTypes.LORE, null);
             return;
         }
-        List<Text> loreText = lore.stream().map(ColorUtil::parseColourToText).toList();
+        List<String> copy = new ArrayList<>(lore);
+        copy.removeIf(String::isBlank);
+        if (copy.isEmpty()) {
+            item.set(DataComponentTypes.LORE, null);
+            return;
+        }
+        List<Text> loreText = copy.stream().map(ColorUtil::parseColourToText).toList();
         item.set(DataComponentTypes.LORE, new LoreComponent(loreText));
+    }
+
+    public static void setLore(ItemStack item, List<String> lore, Map<String, String> loreReplacements) {
+        if (lore == null || lore.isEmpty()) {
+            item.set(DataComponentTypes.LORE, null);
+            return;
+        }
+        ItemHelper.setLore(item, lore.stream().map(line -> StringUtil.replaceRegex(line, loreReplacements)).toList());
     }
 
     public static Enchantment getEnchant(String enchantID) {
