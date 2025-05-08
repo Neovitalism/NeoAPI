@@ -331,6 +331,10 @@ public final class Configuration {
         return (val != null) ? val : def;
     }
 
+    public UUID getUUID(String path) {
+        return UUID.fromString(this.getString(path));
+    }
+
     public Location getLocation(String path) {
         return this.getLocation(path, null);
     }

@@ -7,6 +7,7 @@ import me.neovitalism.neoapi.permissions.DefaultPermissionProvider;
 import me.neovitalism.neoapi.permissions.LuckPermsPermissionProvider;
 import me.neovitalism.neoapi.permissions.PermissionProvider;
 import me.neovitalism.neoapi.player.PlayerManager;
+import me.neovitalism.neoapi.utils.ServerUtil;
 import me.neovitalism.neoapi.utils.UUIDCache;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
@@ -70,14 +71,13 @@ public class NeoAPI extends NeoMod {
     }
 
     private void registerPermissionProvider() {
-        try {
-            Class.forName("net.luckperms.api.LuckPerms");
+        if (ServerUtil.isModLoaded("luckperms")) {
             this.permissionProvider = new LuckPermsPermissionProvider();
             this.getLogger().info("Found LuckPerms! Permission support enabled.");
-            return;
-        } catch (ClassNotFoundException ignored) {}
-        this.permissionProvider = new DefaultPermissionProvider();
-        this.getLogger().warn("Couldn't find LuckPerms.. falling back to permission levels.");
+        } else {
+            this.permissionProvider = new DefaultPermissionProvider();
+            this.getLogger().warn("Couldn't find LuckPerms.. falling back to permission levels.");
+        }
     }
 
     public Future<?> runTaskAsync(Runnable runnable) {

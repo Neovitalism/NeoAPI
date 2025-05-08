@@ -1,6 +1,7 @@
 package me.neovitalism.neoapi.utils;
 
 import me.neovitalism.neoapi.NeoAPI;
+import net.fabricmc.loader.api.FabricLoader;
 import net.kyori.adventure.audience.Audience;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,5 +41,9 @@ public final class ServerUtil {
         if (replacements != null) message = StringUtil.replaceReplacements(message, replacements);
         if (prefix != null && !prefix.isBlank()) message = prefix + message;
         audience.sendMessage(ColorUtil.parseColour(message));
+    }
+
+    public static boolean isModLoaded(String modID) {
+        return FabricLoader.getInstance().isModLoaded(modID);
     }
 }
