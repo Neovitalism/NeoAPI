@@ -3,6 +3,7 @@ package me.neovitalism.neoapi.config;
 import me.neovitalism.neoapi.helpers.ItemHelper;
 import me.neovitalism.neoapi.lang.LangManager;
 import me.neovitalism.neoapi.objects.Location;
+import me.neovitalism.neoapi.utils.TimeUtil;
 import net.minecraft.item.ItemStack;
 
 import java.util.*;
@@ -361,6 +362,10 @@ public final class Configuration {
         Configuration section = this.getSection(path);
         if (section == null) return def;
         return ItemHelper.fromConfig(section, replacements);
+    }
+
+    public long getSeconds(String path, String def) {
+        return TimeUtil.parseSeconds(this.getString(path, def));
     }
 
     public LangManager getLangManager(String path) {

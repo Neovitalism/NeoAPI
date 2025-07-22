@@ -11,8 +11,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class LangManager {
+    public static final LangManager EMPTY = new LangManager();
+
     private final boolean capitalized;
     private final Map<String, String> lang = new HashMap<>();
+
+    private LangManager() {
+        this.capitalized = true;
+    }
 
     public LangManager(Configuration langConfig) {
         this.capitalized = true;
@@ -32,6 +38,10 @@ public final class LangManager {
 
     public @NotNull String getLangSafely(String langKey) {
         return this.lang.getOrDefault(langKey, "");
+    }
+
+    public @NotNull String getOrDefault(String langKey, String def) {
+        return this.lang.getOrDefault(langKey, def);
     }
 
     public void sendLang(Audience audience, String key, @Nullable Map<String, String> replacements) {

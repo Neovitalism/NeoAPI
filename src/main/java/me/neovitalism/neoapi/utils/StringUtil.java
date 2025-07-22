@@ -3,7 +3,6 @@ package me.neovitalism.neoapi.utils;
 import me.neovitalism.neoapi.config.Configuration;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -16,6 +15,7 @@ public final  class StringUtil {
         if (input == null) return null;
         if (replacements != null) {
             for (Map.Entry<String, String> replacer : replacements.entrySet()) {
+                if (replacer.getValue() == null) continue;
                 input = input.replace(replacer.getKey(), replacer.getValue());
             }
         }

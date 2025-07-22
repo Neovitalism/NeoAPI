@@ -19,7 +19,7 @@ public final class SuggestionProviders {
 
         public List(String argName, java.util.List<String> completions) {
             this.argName = argName;
-            this.completions = completions;
+            this.completions = completions.stream().map(arg -> (arg.contains(" ")) ? "\"" + arg + "\"" : arg).toList();
         }
 
         @Override

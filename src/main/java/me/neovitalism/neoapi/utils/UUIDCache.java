@@ -63,6 +63,10 @@ public class UUIDCache {
         return username;
     }
 
+    public static boolean cachesToFile() {
+        return UUIDCache.cacheToFile;
+    }
+
     public static void setCacheToFile(boolean cacheToFile) {
         UUIDCache.cacheToFile = cacheToFile;
     }
