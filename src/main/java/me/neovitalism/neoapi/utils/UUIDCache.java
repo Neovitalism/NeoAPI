@@ -73,7 +73,7 @@ public class UUIDCache {
 
     public static void cacheUUID(String playerName, UUID playerUUID) {
         String cachedUsername = UUIDCache.UUID_USERNAME_CACHE.get(playerUUID);
-        if (cachedUsername == null || cachedUsername.equals(playerName)) {
+        if (cachedUsername == null || !cachedUsername.equals(playerName)) {
             UUIDCache.USERNAME_UUID_CACHE.put(playerName, playerUUID);
             UUIDCache.UUID_USERNAME_CACHE.put(playerUUID, playerName);
             UUIDCache.markDirty();

@@ -22,4 +22,14 @@ public interface PermissionProvider {
         if (source.getPlayer() == null) return null;
         return this.getMetaValue(source.getPlayer(), permission);
     }
+
+    default Double getMetaValueNumber(ServerPlayerEntity player, String permission) {
+        String value = this.getMetaValue(player, permission);
+        if (value == null) return null;
+        try {
+            return Double.parseDouble(value);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
 }

@@ -40,6 +40,10 @@ public final class PlayerManager {
         return PlayerManager.getPlayerManager().getPlayerList();
     }
 
+    public static List<String> getOnlinePlayerNames() {
+        return PlayerManager.getOnlinePlayers().stream().map(p -> p.getName().getString()).toList();
+    }
+
     private static net.minecraft.server.PlayerManager getPlayerManager() {
         return NeoAPI.getServer().getPlayerManager();
     }

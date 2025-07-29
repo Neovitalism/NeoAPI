@@ -31,6 +31,12 @@ public final class LocationUtil {
         return world.getRegistryKey().getValue().toString();
     }
 
+    public static List<String> getAllWorldNames() {
+        List<String> worldNames = new ArrayList<>();
+        for (ServerWorld world : NeoAPI.getServer().getWorlds()) worldNames.add(LocationUtil.getWorldName(world));
+        return worldNames;
+    }
+
     public static Location getLookingAt(ServerPlayerEntity player) {
         HitResult hitResult = player.raycast(500, 0, false);
         Vec3d target = hitResult.getPos();

@@ -77,4 +77,9 @@ public final  class StringUtil {
         }
         return input;
     }
+
+    public static String fixTrailingZeros(double value) {
+        value = Double.parseDouble(String.format("%.4f", value));
+        return (value == 0 || (value % (int) value == 0)) ? String.valueOf((int) value) : String.valueOf(value);
+    }
 }

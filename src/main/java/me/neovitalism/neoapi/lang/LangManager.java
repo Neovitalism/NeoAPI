@@ -21,15 +21,22 @@ public final class LangManager {
     }
 
     public LangManager(Configuration langConfig) {
-        this.capitalized = true;
-        if (langConfig == null) return;
-        for (String key : langConfig.getKeys()) this.lang.put(key, langConfig.getString(key));
+        this(langConfig, true);
     }
 
     public LangManager(Configuration langConfig, boolean capitalized) {
         this.capitalized = capitalized;
         if (langConfig == null) return;
-        for (String key : langConfig.getKeys()) this.lang.put(key, langConfig.getString(key));
+        this.addLang(null, langConfig);
+    }
+
+    private void addLang(String prefix, Configuration langConfig) {
+        for (String key : langConfig.getKeys()) {
+            String langKey = ((prefix == null) ? "" : prefix + ".") + key;
+            if (langConfig.getSection(key) != null) {
+                this.addLang(langKey, langConfig.getSection(key));
+            } else this.lang.put(langKey, langConfig.getString(key));
+        }
     }
 
     public @Nullable String getLang(String langKey) {
