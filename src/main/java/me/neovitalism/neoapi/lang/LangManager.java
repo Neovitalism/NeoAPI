@@ -33,9 +33,12 @@ public final class LangManager {
     private void addLang(String prefix, Configuration langConfig) {
         for (String key : langConfig.getKeys()) {
             String langKey = ((prefix == null) ? "" : prefix + ".") + key;
-            if (langConfig.getSection(key) != null) {
+            Object obj = langConfig.get(langKey);
+            if (obj instanceof Configuration) {
                 this.addLang(langKey, langConfig.getSection(key));
-            } else this.lang.put(langKey, langConfig.getString(key));
+            } else if (obj instanceof String) {
+                this.lang.put(langKey, langConfig.getString(key));
+            }
         }
     }
 

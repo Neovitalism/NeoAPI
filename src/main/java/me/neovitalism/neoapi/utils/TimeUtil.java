@@ -69,7 +69,7 @@ public final class TimeUtil {
                 if (usedComma) timeString.append(langManager.getOrDefault("timeunit-comma", ","));
                 timeString.append(" ").append(langManager.getOrDefault("timeunit-joiner", "and")).append(" ");
             } else {
-                timeString.append(langManager.getOrDefault("timeunit-comma", ","));
+                timeString.append(langManager.getOrDefault("timeunit-comma", ",")).append(" ");
                 usedComma = true;
             }
         }
