@@ -27,6 +27,22 @@ public final class TimeUtil {
         }
     }
 
+    public static long parseSecondsFromKey(String input) {
+        String[] split = input.split("-");
+        if (split.length != 2) return -1;
+        long time;
+        try {
+            time = Long.parseLong(split[0]);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+        String timeUnit = split[1];
+        if (timeUnit.replaceFirst("seconds?", "").isEmpty()) return time;
+        if (timeUnit.replaceFirst("minutes?", "").isEmpty()) return time * 60;
+        if (timeUnit.replaceFirst("hours?", "").isEmpty()) return time * 3600;
+        return -1;
+    }
+
     public static long ticksToMS(long ticks) {
         return ticks * 50;
     }
