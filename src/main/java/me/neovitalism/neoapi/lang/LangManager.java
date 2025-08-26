@@ -1,5 +1,6 @@
 package me.neovitalism.neoapi.lang;
 
+import me.neovitalism.neoapi.NeoAPI;
 import me.neovitalism.neoapi.config.Configuration;
 import me.neovitalism.neoapi.utils.ColorUtil;
 import me.neovitalism.neoapi.utils.StringUtil;
@@ -32,11 +33,10 @@ public final class LangManager {
 
     private void addLang(String prefix, Configuration langConfig) {
         for (String key : langConfig.getKeys()) {
-            String langKey = ((prefix == null) ? "" : prefix + ".") + key;
-            Object obj = langConfig.get(langKey);
-            if (obj instanceof Configuration) {
-                this.addLang(langKey, langConfig.getSection(key));
-            } else if (obj instanceof String) {
+            if (langConfig.get(key) instanceof Configuration) {
+                this.addLang(key, langConfig.getSection(key));
+            } else {
+                String langKey = ((prefix == null) ? "" : prefix + ".") + key;
                 this.lang.put(langKey, langConfig.getString(key));
             }
         }
@@ -55,10 +55,14 @@ public final class LangManager {
     }
 
     public void sendLang(Audience audience, String key, @Nullable Map<String, String> replacements) {
+        String prefix = this.getLang((this.capitalized) ? "Prefix" : "prefix");
+        this.sendLang(audience, prefix, key, replacements);
+    }
+
+    public void sendLang(Audience audience, String prefix, String key, @Nullable Map<String, String> replacements) {
         String lang = this.getLang(key);
         if (lang == null || lang.isBlank()) return;
         lang = StringUtil.replaceReplacements(lang, replacements);
-        String prefix = this.getLang((this.capitalized) ? "Prefix" : "prefix");
         if (prefix != null) lang = prefix + lang;
         audience.sendMessage(ColorUtil.parseColour(lang));
     }

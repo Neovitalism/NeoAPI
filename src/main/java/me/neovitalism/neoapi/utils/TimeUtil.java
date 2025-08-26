@@ -101,7 +101,7 @@ public final class TimeUtil {
             timeString.append(" ").append(langManager.getOrDefault("timeunit-joiner", "and")).append(" ");
         }
         String secondsLang;
-        if (newSeconds < 0) secondsLang = langManager.getOrDefault("timeunit-second", "second");
+        if (newSeconds == 1) secondsLang = langManager.getOrDefault("timeunit-second", "second");
         else secondsLang = langManager.getOrDefault("timeunit-seconds", "seconds");
         timeString.append(newSeconds).append(" ").append(secondsLang);
         return timeString.toString();

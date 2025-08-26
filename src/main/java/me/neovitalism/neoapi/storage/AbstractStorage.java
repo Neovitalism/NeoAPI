@@ -17,12 +17,19 @@ public abstract class AbstractStorage {
     protected MariaDBConnection databaseConnection;
 
     private NeoExecutor executor = null;
-    private boolean markedToSave = false;
-    private Future<?> saveFuture = null;
+    protected boolean markedToSave = false;
+    protected Future<?> saveFuture = null;
 
     public AbstractStorage(NeoMod instance, boolean saveResource) {
+        this(instance, "storage.yml", saveResource);
+    }
+
+    public AbstractStorage(NeoMod instance, String fileName, boolean saveResource) {
+        this(instance, instance.getConfig(fileName, saveResource));
+    }
+
+    public AbstractStorage(NeoMod instance, Configuration storageConfig) {
         this.instance = instance;
-        Configuration storageConfig = instance.getConfig("storage.yml", saveResource);
         if (storageConfig != null) {
             StorageType storageType = StorageType.getByName(storageConfig.getString("storage-type"));
             if (storageType == StorageType.MARIADB) {
@@ -89,7 +96,7 @@ public abstract class AbstractStorage {
         }
     }
 
-    private void save() {
+    protected void save() {
         Configuration config = this.toConfig();
         if (config == null) return;
         this.instance.saveConfig(this.getFileName(), config);
