@@ -145,6 +145,14 @@ public class ItemHelper {
         item.set(DataComponentTypes.MAX_STACK_SIZE, Math.clamp(amount, 1, 99));
     }
 
+    public static void setDurability(ItemStack item, int durability) {
+        item.set(DataComponentTypes.DAMAGE, durability);
+    }
+
+    public static void setMaxDurability(ItemStack item, int durability) {
+        item.set(DataComponentTypes.MAX_DAMAGE, durability);
+    }
+
     public static void setEnchantGlint(ItemStack item, boolean value) {
         item.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, value);
     }

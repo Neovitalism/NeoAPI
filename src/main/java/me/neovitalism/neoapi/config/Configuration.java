@@ -1,12 +1,19 @@
 package me.neovitalism.neoapi.config;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializer;
+import com.google.gson.reflect.TypeToken;
 import me.neovitalism.neoapi.helpers.ItemHelper;
 import me.neovitalism.neoapi.lang.LangManager;
 import me.neovitalism.neoapi.objects.Location;
 import me.neovitalism.neoapi.utils.TimeUtil;
 import net.minecraft.item.ItemStack;
 
+import java.lang.reflect.Type;
 import java.util.*;
+import java.util.function.Function;
 
 public final class Configuration {
     private static final char SEPARATOR = '.';
@@ -374,5 +381,40 @@ public final class Configuration {
 
     public LangManager getLangManager(String path, boolean capitalized) {
         return new LangManager(this.getSection(path), capitalized);
+    }
+
+    public <T> Map<String, T> getMap(String mapKey, Function<Configuration, T> mappingFunction) {
+        Map<String, T> map = new HashMap<>();
+        Configuration config = this.getSection(mapKey);
+        if (config == null) return map;
+        for (String key : config.getKeys()) {
+            Configuration section = config.getSection(key);
+            if (section == null) continue;
+            map.put(key, mappingFunction.apply(section));
+        }
+        return map;
+    }
+
+    private static final Gson GSON = new GsonBuilder()
+            .registerTypeAdapter(Configuration.class, (JsonSerializer<Configuration>) (src, type, ctx) -> {
+                JsonObject obj = new JsonObject();
+                for (Map.Entry<String, Object> entry : src.self.entrySet()) {
+                    if (entry.getValue() instanceof Configuration) {
+                        obj.add(entry.getKey(), ctx.serialize(entry.getValue(), Configuration.class));
+                    } else {
+                        obj.add(entry.getKey(), ctx.serialize(entry.getValue()));
+                    }
+                }
+                return obj;
+            }).disableHtmlEscaping().create();
+    private static final Type MAP_TYPE = new TypeToken<Map<String, Object>>() {}.getType();
+
+    public String toJson() {
+        return Configuration.GSON.toJson(this.self);
+    }
+
+    public static Configuration fromJson(String json) {
+        Map<String, Object> map = GSON.fromJson(json, MAP_TYPE);
+        return new Configuration(map, null);
     }
 }

@@ -48,7 +48,9 @@ public abstract class AbstractStorage {
         } else this.storageType = StorageType.YAML;
     }
 
-    public abstract String getFileName();
+    public String getFileName() {
+        return null;
+    }
     public abstract Map<String, String> getTables();
 
     public void load() {
@@ -61,17 +63,15 @@ public abstract class AbstractStorage {
         }
     }
 
-    public abstract void load(Configuration config);
-    public abstract void loadToDB(Configuration config);
+    public void load(Configuration config) {};
+    public void loadToDB(Configuration config) {};
 
     private void deleteFile() {
         File file = this.instance.getFile(this.getFileName());
-        boolean deleted = file.delete();
-        if (!deleted) return;
+        if (!file.delete()) return;
         File parent = file.getParentFile();
         while (parent.isDirectory() && Objects.requireNonNull(parent.listFiles()).length == 0) {
-            deleted = parent.delete();
-            if (!deleted) return;
+            if (!parent.delete()) return;
             parent = parent.getParentFile();
         }
     }
