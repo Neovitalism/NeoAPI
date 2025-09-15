@@ -390,9 +390,25 @@ public final class Configuration {
         for (String key : config.getKeys()) {
             Configuration section = config.getSection(key);
             if (section == null) continue;
-            map.put(key, mappingFunction.apply(section));
+            T o = mappingFunction.apply(section);
+            if (o == null) continue;
+            map.put(key, o);
         }
         return map;
+    }
+
+    public <T> List<T> getList(String listKey, Function<Configuration, T> mappingFunction) {
+        List<T> list = new ArrayList<>();
+        Configuration config = this.getSection(listKey);
+        if (config == null) return list;
+        for (String key : config.getKeys()) {
+            Configuration section = config.getSection(key);
+            if (section == null) continue;
+            T o = mappingFunction.apply(section);
+            if (o == null) continue;
+            list.add(o);
+        }
+        return list;
     }
 
     private static final Gson GSON = new GsonBuilder()

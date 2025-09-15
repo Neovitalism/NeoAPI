@@ -146,7 +146,9 @@ public class ItemHelper {
     }
 
     public static void setDurability(ItemStack item, int durability) {
-        item.set(DataComponentTypes.DAMAGE, durability);
+        int maxDurability = item.getOrDefault(DataComponentTypes.MAX_DAMAGE, -1);
+        if (maxDurability == -1) return;
+        item.set(DataComponentTypes.DAMAGE, maxDurability - durability);
     }
 
     public static void setMaxDurability(ItemStack item, int durability) {

@@ -12,11 +12,11 @@ public final class PlayerManager {
     }
 
     public static void addTag(ServerPlayerEntity player, String tag) {
-        player.getCommandTags().add(tag);
+        player.addCommandTag(tag);
     }
 
     public static void removeTag(ServerPlayerEntity player, String tag) {
-        player.getCommandTags().remove(tag);
+        player.removeCommandTag(tag);
     }
 
     public static boolean toggleTag(ServerPlayerEntity player, String tag) {
