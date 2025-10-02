@@ -3,6 +3,7 @@ package me.neovitalism.neoapi.objects;
 import me.neovitalism.neoapi.config.Configuration;
 import me.neovitalism.neoapi.utils.LocationUtil;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -79,6 +80,10 @@ public class Location {
         return this.world;
     }
 
+    public String getWorldName() {
+        return LocationUtil.getWorldName(this.world);
+    }
+
     public double getX() {
         return this.x;
     }
@@ -117,7 +122,12 @@ public class Location {
 
     public BlockState getBlockState() {
         if (this.world == null) return null;
-        return world.getBlockState(this.getBlockPos());
+        return this.world.getBlockState(this.getBlockPos());
+    }
+
+    public BlockEntity getBlockEntity() {
+        if (this.world == null) return null;
+        return this.world.getBlockEntity(this.getBlockPos());
     }
 
     public void setWorld(ServerWorld world) {

@@ -397,6 +397,20 @@ public final class Configuration {
         return map;
     }
 
+    public <T> LinkedHashMap<String, T> getOrderedMap(String mapKey, Function<Configuration, T> mappingFunction) {
+        LinkedHashMap<String, T> map = new LinkedHashMap<>();
+        Configuration config = this.getSection(mapKey);
+        if (config == null) return map;
+        for (String key : config.getKeys()) {
+            Configuration section = config.getSection(key);
+            if (section == null) continue;
+            T o = mappingFunction.apply(section);
+            if (o == null) continue;
+            map.put(key, o);
+        }
+        return map;
+    }
+
     public <T> List<T> getList(String listKey, Function<Configuration, T> mappingFunction) {
         List<T> list = new ArrayList<>();
         Configuration config = this.getSection(listKey);
