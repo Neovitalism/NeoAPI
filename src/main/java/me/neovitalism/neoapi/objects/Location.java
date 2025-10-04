@@ -235,8 +235,8 @@ public class Location {
         locationConfig.set("x", this.x);
         locationConfig.set("y", this.y);
         locationConfig.set("z", this.z);
-        locationConfig.set("pitch", this.pitch);
-        locationConfig.set("yaw", this.yaw);
+        if (this.pitch != -1000) locationConfig.set("pitch", this.pitch);
+        if (this.yaw != -1000) locationConfig.set("yaw", this.yaw);
         return locationConfig;
     }
 
