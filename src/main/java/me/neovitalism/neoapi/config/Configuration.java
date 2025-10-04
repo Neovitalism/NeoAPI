@@ -8,8 +8,10 @@ import com.google.gson.reflect.TypeToken;
 import me.neovitalism.neoapi.helpers.ItemHelper;
 import me.neovitalism.neoapi.lang.LangManager;
 import me.neovitalism.neoapi.objects.Location;
+import me.neovitalism.neoapi.objects.Sound;
 import me.neovitalism.neoapi.utils.TimeUtil;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Identifier;
 
 import java.lang.reflect.Type;
 import java.util.*;
@@ -423,6 +425,22 @@ public final class Configuration {
             list.add(o);
         }
         return list;
+    }
+
+    public Identifier getIdentifier(String key) {
+        return this.getIdentifier(key, null);
+    }
+
+    public Identifier getIdentifier(String key, Identifier def) {
+        String string = this.getString(key, null);
+        if (string == null) return def;
+        return Identifier.of(string);
+    }
+
+    public Sound getSound(String key) {
+        Configuration section = this.getSection(key);
+        if (section == null) return null;
+        return new Sound(section);
     }
 
     private static final Gson GSON = new GsonBuilder()
