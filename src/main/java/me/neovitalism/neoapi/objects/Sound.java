@@ -2,6 +2,7 @@ package me.neovitalism.neoapi.objects;
 
 import me.neovitalism.neoapi.config.Configuration;
 import me.neovitalism.neoapi.player.PlayerManager;
+import me.neovitalism.neoapi.utils.ServerUtil;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -30,20 +31,16 @@ public class Sound {
         this.distance = config.getFloat("distance", 16.0F);
     }
 
-    /**
-     * Sends the sound to a single player. This must be called synchronously.
-     */
     public void sendToPlayer(ServerPlayerEntity player) {
-        player.networkHandler.sendPacket(this.buildPacket(player));
+        ServerUtil.executeSync(() -> player.networkHandler.sendPacket(this.buildPacket(player)));
     }
 
-    /**
-     * Sends the sound to all players. This must be called synchronously.
-     */
     public void sendToAll() {
-        for (ServerPlayerEntity player : PlayerManager.getOnlinePlayers()) {
-            player.networkHandler.sendPacket(this.buildPacket(player));
-        }
+        ServerUtil.executeSync(() -> {
+            for (ServerPlayerEntity player : PlayerManager.getOnlinePlayers()) {
+                player.networkHandler.sendPacket(this.buildPacket(player));
+            }
+        });
     }
 
     private PlaySoundS2CPacket buildPacket(ServerPlayerEntity player) {

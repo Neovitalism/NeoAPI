@@ -54,7 +54,11 @@ public class ItemHelper {
         ItemHelper.setLore(item, lore.stream().map(line -> StringUtil.replaceReplacements(line, replacements)).toList(), loreReplacements);
         item.setCount(config.getInt("amount", 1));
         Configuration enchantSection = config.getSection("enchants");
-        for (String key : enchantSection.getKeys()) ItemHelper.addEnchantment(item, key, enchantSection.getInt(key));
+        if (enchantSection != null) {
+            for (String key : enchantSection.getKeys()) {
+                ItemHelper.addEnchantment(item, key, enchantSection.getInt(key));
+            }
+        }
         if (config.contains("custom-model-data")) ItemHelper.setCustomModelData(item, config.getInt("custom-model-data"));
         if (config.contains("max-stack-size")) ItemHelper.setMaxStackSize(item, config.getInt("max-stack-size"));
         ItemHelper.hideTooltip(item, config.getBoolean("hide-tooltip"));

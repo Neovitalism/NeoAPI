@@ -116,6 +116,7 @@ public final class Configuration {
     }
 
     public Configuration getSection(String path) {
+        if (!this.contains(path) && (defaults == null || !defaults.contains(path))) return null;
         Object def = getDefault(path);
         return (Configuration) get(path, (def instanceof Configuration) ? def : new Configuration((defaults == null) ? null : defaults.getSection(path)));
     }

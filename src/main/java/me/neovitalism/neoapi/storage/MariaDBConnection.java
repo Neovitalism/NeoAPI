@@ -33,7 +33,7 @@ public class MariaDBConnection {
         config.setPassword(settings.getString("password"));
         config.setMaximumPoolSize(10);
         config.setMinimumIdle(2);
-        config.setIdleTimeout(30000);
+        config.setIdleTimeout(15000);
         config.setMaxLifetime(30000);
         config.setLeakDetectionThreshold(5000);
         this.dataSource = new HikariDataSource(config);
