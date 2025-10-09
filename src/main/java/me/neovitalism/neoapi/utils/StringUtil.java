@@ -82,4 +82,31 @@ public final  class StringUtil {
         value = Double.parseDouble(String.format("%.4f", value));
         return (value == 0 || (value % (int) value == 0)) ? String.valueOf((int) value) : String.valueOf(value);
     }
+
+    public static String getNumericalPlace(int value) {
+        return switch (value) {
+            case 1 -> "first";
+            case 2 -> "second";
+            case 3 -> "third";
+            case 4 -> "fourth";
+            case 5 -> "fifth";
+            case 6 -> "sixth";
+            case 7 -> "seventh";
+            case 8 -> "eighth";
+            case 9 -> "ninth";
+            case 10 -> "tenth";
+            default -> value + StringUtil.getNumericalSuffix(value);
+        };
+    }
+
+    public static String getNumericalSuffix(int value) {
+        int mod = value % 100;
+        if (mod >= 11 && mod <= 13) return "th";
+        return switch (value) {
+            case 1 -> "st";
+            case 2 -> "nd";
+            case 3 -> "rd";
+            default -> "th";
+        };
+    }
 }

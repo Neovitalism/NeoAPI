@@ -1,5 +1,7 @@
 package me.neovitalism.neoapi.helpers;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.serialization.DataResult;
 import me.neovitalism.neoapi.NeoAPI;
 import me.neovitalism.neoapi.config.Configuration;
 import me.neovitalism.neoapi.utils.ColorUtil;
@@ -18,6 +20,7 @@ import net.minecraft.nbt.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.RegistryOps;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -218,5 +221,24 @@ public class ItemHelper {
         if (player.giveItemStack(item)) return;
         ItemEntity itemEntity = new ItemEntity(player.getWorld(), player.getX(), player.getY(), player.getZ(), item);
         player.getWorld().spawnEntity(itemEntity);
+    }
+
+    public static String toString(ItemStack item) {
+        DataResult<NbtElement> encodeResult = ItemHelper.getOps().withEncoder(ItemStack.CODEC).apply(item);
+        return encodeResult.getOrThrow().toString();
+    }
+
+    public static ItemStack fromString(String input) {
+        try {
+            return ItemHelper.getOps().withDecoder(ItemStack.CODEC).apply(StringNbtReader.parse(input)).getOrThrow().getFirst();
+        } catch (CommandSyntaxException e) {
+            NeoAPI.inst().getLogger().error("Something went wrong obtaining an item from string: " + input);
+            NeoAPI.inst().getLogger().printStackTrace(e);
+            return null;
+        }
+    }
+
+    private static RegistryOps<NbtElement> getOps() {
+        return NeoAPI.getServer().getRegistryManager().getOps(NbtOps.INSTANCE);
     }
 }
