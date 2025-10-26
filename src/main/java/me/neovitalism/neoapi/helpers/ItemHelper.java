@@ -19,6 +19,7 @@ import net.minecraft.nbt.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.RegistryOps;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -221,14 +222,18 @@ public class ItemHelper {
         player.getWorld().spawnEntity(itemEntity);
     }
 
+    private static RegistryOps<NbtElement> getNbtOps() {
+        return RegistryOps.of(NbtOps.INSTANCE, NeoAPI.getServer().getRegistryManager());
+    }
+
     public static String toString(ItemStack item) {
-        return ItemStack.CODEC.encodeStart(NbtOps.INSTANCE, item).getOrThrow().toString();
+        return ItemStack.CODEC.encodeStart(ItemHelper.getNbtOps(), item).getOrThrow().toString();
     }
 
     public static ItemStack fromString(String input) {
         try {
             NbtCompound compound = StringNbtReader.parse(input);
-            return ItemStack.CODEC.parse(NbtOps.INSTANCE, compound).getOrThrow();
+            return ItemStack.CODEC.parse(ItemHelper.getNbtOps(), compound).getOrThrow();
         } catch (CommandSyntaxException e) {
             NeoAPI.inst().getLogger().error("Something went wrong obtaining an item from string: " + input);
             NeoAPI.inst().getLogger().printStackTrace(e);
