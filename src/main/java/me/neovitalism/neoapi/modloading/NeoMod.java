@@ -15,7 +15,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.function.Consumer;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public abstract class NeoMod implements ModInitializer {
@@ -69,12 +73,39 @@ public abstract class NeoMod implements ModInitializer {
 
     public Configuration getConfig(File configFile) {
         try {
-            return YamlConfiguration.loadConfiguration(configFile); // ?
+            return YamlConfiguration.loadConfiguration(configFile);
         } catch (IOException e) {
             this.logger.error("Something went wrong getting the config: " + configFile.getName() + ".");
             this.logger.printStackTrace(e);
         }
         return null;
+    }
+
+    public List<Configuration> getConfigs(File folder) {
+        return this.getConfigMap(folder).values().stream().toList();
+    }
+
+    public void forConfigInFolder(File folder, Consumer<Configuration> configConsumer) {
+        for (Configuration config : this.getConfigMap(folder).values()) configConsumer.accept(config);
+    }
+
+    public Map<String, Configuration> getConfigMap(File folder) {
+        Map<String, Configuration> configMap = new HashMap<>();
+        this.getConfigsFromFolder(folder, configMap);
+        return configMap;
+    }
+
+    private void getConfigsFromFolder(File folder, Map<String, Configuration> configs) {
+        File[] children = folder.listFiles();
+        if (children == null) return;
+        for (File child : children) {
+            if (child.isDirectory()) {
+                this.getConfigsFromFolder(child, configs);
+            } else {
+                Configuration config = this.getConfig(child);
+                configs.put(child.getName().replace(".yml", ""), config);
+            }
+        }
     }
 
     public void saveConfig(String fileName, Configuration config) {

@@ -8,12 +8,11 @@ public class RandomHelper {
     private static final Random RANDOM = new Random();
 
     public static boolean oneIn(int amount) {
-        if (amount < 1) return false;
-        return RandomHelper.RANDOM.nextInt(amount) == 0;
+        return amount > 0 && (amount == 1 || RandomHelper.RANDOM.nextInt(amount) == 0);
     }
 
     public static boolean oneIn(double amount) {
-        return (amount >= 1) ? (RandomHelper.RANDOM.nextDouble() < 1 / amount) : (RandomHelper.RANDOM.nextDouble() < amount);
+        return amount > 0 && (amount <= 1 || (RandomHelper.RANDOM.nextDouble() < 1 / amount));
     }
 
     public static boolean chanceOutOf(int chances, int amount) {

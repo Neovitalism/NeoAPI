@@ -125,6 +125,12 @@ public class Location {
         return this.world.getBlockState(this.getBlockPos());
     }
 
+    public void setBlockState(BlockState state, boolean forceLoad) {
+        if (forceLoad) this.setForceLoaded(true);
+        this.getWorld().setBlockState(this.getBlockPos(), state);
+        if (forceLoad) this.setForceLoaded(false);
+    }
+
     public BlockEntity getBlockEntity() {
         if (this.world == null) return null;
         return this.world.getBlockEntity(this.getBlockPos());
@@ -205,6 +211,11 @@ public class Location {
     public boolean isLoaded() {
         ChunkPos chunkPos = this.getChunk().getPos();
         return this.getWorld().isChunkLoaded(chunkPos.x, chunkPos.z);
+    }
+
+    public void setForceLoaded(boolean forced) {
+        ChunkPos chunkPos = this.getChunk().getPos();
+        this.getWorld().setChunkForced(chunkPos.x, chunkPos.z, forced);
     }
 
     public Location copy() {
