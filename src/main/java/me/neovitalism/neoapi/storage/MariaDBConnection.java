@@ -104,7 +104,7 @@ public class MariaDBConnection {
         T apply(ResultSet resultSet) throws SQLException;
     }
 
-    protected void shutdown() {
+    public void shutdown() {
         this.dataSource.close();
     }
 }
