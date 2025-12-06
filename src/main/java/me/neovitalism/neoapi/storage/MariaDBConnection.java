@@ -8,6 +8,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /*
 | SQL Data Type   | Java Type       |
@@ -92,6 +95,20 @@ public class MariaDBConnection {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public <T> List<T> queryBatch(String statement, Map<Query, ResultHandler<T>> queries) {
+        List<T> list = new ArrayList<>();
+        try (Connection connection = this.dataSource.getConnection()) {
+            for (Map.Entry<Query, ResultHandler<T>> query : queries.entrySet()) {
+                PreparedStatement preparedStatement = connection.prepareStatement(statement);
+                query.getKey().accept(preparedStatement);
+                list.add(query.getValue().apply(preparedStatement.executeQuery()));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 
     @FunctionalInterface
