@@ -254,4 +254,8 @@ public class Location {
     public static Location from(ServerWorld world, BlockPos pos) {
         return new Location(world, pos.getX(), pos.getY(), pos.getZ());
     }
+
+    public static Location from(ServerWorld world, Vec3d pos) {
+        return new Location(world, pos.getX(), pos.getY(), pos.getZ());
+    }
 }

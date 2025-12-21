@@ -129,11 +129,13 @@ public final class TimeUtil {
         long days = TimeUnit.SECONDS.toDays(seconds);
         long hoursNoDays = TimeUnit.SECONDS.toHours(seconds);
         long hours = TimeUnit.DAYS.toHours(days) - hoursNoDays;
+        long minutesNoHours = TimeUnit.SECONDS.toMinutes(seconds);
         long minutes = TimeUnit.SECONDS.toMinutes(seconds) - TimeUnit.HOURS.toMinutes(hoursNoDays);
         long secondsLeft = seconds - TimeUnit.HOURS.toSeconds(hoursNoDays) - TimeUnit.MINUTES.toSeconds(minutes);
         replacements.put("{days}", String.valueOf(days));
         replacements.put("{hours-no-days}", String.valueOf(hoursNoDays));
         replacements.put("{hours}", String.valueOf(hours));
+        replacements.put("{minutes-no-hours}", String.valueOf(minutesNoHours));
         replacements.put("{minutes}", String.valueOf(minutes));
         replacements.put("{seconds}", String.valueOf(secondsLeft));
     }
@@ -142,11 +144,13 @@ public final class TimeUtil {
         long days = TimeUnit.SECONDS.toDays(seconds);
         long hoursNoDays = TimeUnit.SECONDS.toHours(seconds);
         long hours = TimeUnit.DAYS.toHours(days) - hoursNoDays;
+        long minutesNoHours = TimeUnit.SECONDS.toMinutes(seconds);
         long minutes = TimeUnit.SECONDS.toMinutes(seconds) - TimeUnit.HOURS.toMinutes(hoursNoDays);
         long secondsLeft = seconds - TimeUnit.HOURS.toSeconds(hoursNoDays) - TimeUnit.MINUTES.toSeconds(minutes);
         replacements.put("{days}", TimeUtil.cleanTime(days));
         replacements.put("{hours-no-days}", TimeUtil.cleanTime(hoursNoDays));
         replacements.put("{hours}", TimeUtil.cleanTime(hours));
+        replacements.put("{minutes-no-hours}", TimeUtil.cleanTime(minutesNoHours));
         replacements.put("{minutes}", TimeUtil.cleanTime(minutes));
         replacements.put("{seconds}", TimeUtil.cleanTime(secondsLeft));
     }
