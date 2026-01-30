@@ -48,6 +48,10 @@ public final class ColorUtil {
         return GsonComponentSerializer.gson().serialize(component);
     }
 
+    public static String stripTags(String input) {
+        return MiniMessage.miniMessage().stripTags(input);
+    }
+
     private static String replaceCodes(String input) {
         Matcher matcher = ColorUtil.HEX_PATTERN.matcher(input);
         while (matcher.find()) {

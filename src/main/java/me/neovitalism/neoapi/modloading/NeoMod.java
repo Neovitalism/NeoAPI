@@ -25,7 +25,7 @@ import java.util.function.Consumer;
 public abstract class NeoMod implements ModInitializer {
     private final NeoModLogger logger = new NeoModLogger(this.getModID());
 
-    public abstract String getModID();
+    public abstract String getModID(); // ToDo: 3.0 getClass().getSimpleName()
     public abstract String getModPrefix();
 
     @Override
@@ -133,4 +133,6 @@ public abstract class NeoMod implements ModInitializer {
             this.logger.printStackTrace(e);
         }
     }
+
+    // ToDo: 3.0 - inst = Map<String, ? extends NeoMod> casted to itself
 }

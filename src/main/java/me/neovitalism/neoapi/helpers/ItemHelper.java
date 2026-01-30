@@ -234,7 +234,7 @@ public class ItemHelper {
         try {
             NbtCompound compound = StringNbtReader.parse(input);
             return ItemStack.CODEC.parse(ItemHelper.getNbtOps(), compound).getOrThrow();
-        } catch (CommandSyntaxException e) {
+        } catch (Exception e) {
             NeoAPI.inst().getLogger().error("Something went wrong obtaining an item from string: " + input);
             NeoAPI.inst().getLogger().printStackTrace(e);
             return null;
